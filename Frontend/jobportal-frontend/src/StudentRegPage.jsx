@@ -1,5 +1,5 @@
 import './StudentRegPage.css'
-
+import axios from "axios"
 function StudentRegPage() {
     function submit(e) {
           e.preventDefault()
@@ -19,7 +19,7 @@ function StudentRegPage() {
              workingStatus: e.target.workingStatus.value
         }
         
-      axios.post("http://localhost:8080/api/students",data).
+      axios.post("http://localhost:8080/api/students/register",data).
       then(res =>{
         console.log(res.data)
         alert("Student registered successfully")
