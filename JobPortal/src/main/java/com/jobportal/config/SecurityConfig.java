@@ -10,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -17,35 +18,44 @@ public class SecurityConfig {
     @Autowired
     private JwtFilter jwtFilter;
 
-@Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-    http
-        .cors(cors -> {})
-        .csrf(csrf -> csrf.disable())
-        .formLogin(form -> form.disable())
-        .httpBasic(basic -> basic.disable())
+        http
+            // ✅ enable CORS
+            .cors(cors -> {})
 
-        .authorizeHttpRequests(auth -> auth
-            // ✅ allow login + register
-            .requestMatchers(
-                "/api/auth/**",
-                "/api/students/register"
-            ).permitAll()
+            // ❌ disable CSRF (JWT based)
+            .csrf(csrf -> csrf.disable())
 
-            // ✅ allow preflight
-            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            // ❌ disable default auth
+            .formLogin(form -> form.disable())
+            .httpBasic(basic -> basic.disable())
 
-            // 🔒 everything else protected
-            .anyRequest().authenticated()
-        )
+            // 🔐 Authorization rules
+            .authorizeHttpRequests(auth -> auth
 
-        // ✅ JWT filter AFTER CORS & before auth
-        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                // ✅ PUBLIC APIs (NO TOKEN REQUIRED)
+                .requestMatchers(
+                    "/api/auth/student/**",   // student login/register
+                    "/api/auth/employee/**",  // employee login/register
+                    "/api/students/register"  // (optional legacy)
+                ).permitAll()
 
-    return http.build();
-}
+                // ✅ allow preflight (CORS)
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
+                // 🔒 everything else needs JWT
+                .anyRequest().authenticated()
+            )
+
+            // ✅ JWT filter before Spring auth
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+    // 🔐 Password encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

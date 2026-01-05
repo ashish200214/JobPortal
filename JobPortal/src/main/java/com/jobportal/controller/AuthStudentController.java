@@ -30,7 +30,7 @@ public class AuthStudentController {
                 .body("Invalid credentials");
     }
 
-    String token = jwtUtil.generateToken(request.getEmail());
+    String token = jwtUtil.generateStudentToken(request.getEmail());
 
     return ResponseEntity.ok(token);
     
