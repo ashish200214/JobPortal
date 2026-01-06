@@ -36,7 +36,8 @@ function EmployeeRegister() {
 
     return (
         <>
-            <form onSubmit={submit}>
+        <h1>Employee Registeration</h1>
+            <form onSubmit={submit} method="post">
 
                 <input type="text" name="name" placeholder="Enter your name" required />
                 <input type="email" name="email" placeholder="Enter your email" required />

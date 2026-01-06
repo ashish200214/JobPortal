@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -22,40 +22,31 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            // ✅ enable CORS
             .cors(cors -> {})
-
-            // ❌ disable CSRF (JWT based)
             .csrf(csrf -> csrf.disable())
-
-            // ❌ disable default auth
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable())
 
-            // 🔐 Authorization rules
             .authorizeHttpRequests(auth -> auth
-
-                // ✅ PUBLIC APIs (NO TOKEN REQUIRED)
+                // PUBLIC
                 .requestMatchers(
-                    "/api/auth/student/**",   // student login/register
-                    "/api/auth/employee/**",  // employee login/register
-                    "/api/students/register"  // (optional legacy)
+                        "/api/auth/student/**",
+                        "/api/auth/employee/**"
                 ).permitAll()
 
-                // ✅ allow preflight (CORS)
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                // 🔒 everything else needs JWT
+                // PROTECTED
+                .requestMatchers("/api/job/**").authenticated()
+
                 .anyRequest().authenticated()
             )
 
-            // ✅ JWT filter before Spring auth
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // 🔐 Password encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

@@ -5,6 +5,7 @@ import JobApply from './assets/JobApply';
 import Login from './assets/Login';
 import EmployeeRegister from './assets/EmployeeRegister'
 import EmployeeLogin from './assets/EmployeeLogin';
+import PostJobPage from './assets/PostJobPage';
 function App() {
 
   return (
@@ -18,6 +19,7 @@ function App() {
       <Route path='/registerEmployee' element={<EmployeeRegister />}></Route>
       <Route path="/loginE" element={<EmployeeLogin />}></Route>
       <Route path='/addjob' element={<JobApply />}></Route>
+      <Route path='/employee/postJob/' element={<PostJobPage />}></Route>
     </Routes>
     </>
   )

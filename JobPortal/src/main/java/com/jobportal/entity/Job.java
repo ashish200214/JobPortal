@@ -2,6 +2,7 @@ package com.jobportal.entity;
 
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,7 +12,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import lombok.Data;
 
-@Data
+@Data   
 @Entity
 
 public class Job {
@@ -21,7 +22,7 @@ private Long id;
 
 private Long emp_id;
 private String jobRole;
-@ManyToMany
+@ManyToMany(cascade = CascadeType.ALL)
 @JoinTable(
         name = "job_skills",
         joinColumns = @JoinColumn(name = "job_id"),
