@@ -1,53 +1,52 @@
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function EmployeeRegister() {
+
+    const navigate = useNavigate();
 
     function submit(e) {
         e.preventDefault();
 
-        let mobileNo = e.target.mobileNo.value.trim();
-
-        if (isNaN(mobileNo) || mobileNo.length !== 10) {
-            alert("Please enter valid mobile number");
-            return;
-        }
-
-        let data = {
-            name: e.target.name.value,
+        const data = {
             email: e.target.email.value,
-            password: e.target.password.value,
-            mobileNo: mobileNo,
-            city: e.target.city.value
+            password: e.target.password.value
         };
 
-        axios.post("http://localhost:8080/api/auth/employee/register", data)
-            .then(res => {
-                console.log(res.data);
-                alert("Employee registered successfully");
+        axios.post("http://localhost:8080/api/employee/register", data)
+            .then(() => {
+                alert("Employer registered successfully");
+                navigate("/employee/login");
             })
-            .catch(err => {
-                if (err.response) {
-                    alert(err.response.data);
-                } else {
-                    alert("Server not reachable...");
-                }
+            .catch((err) => {
+                alert(err.response?.data || "Registration failed");
             });
     }
 
     return (
-        <>
-        <h1>Employee Registeration</h1>
-            <form onSubmit={submit} method="post">
+        <div className="container d-flex justify-content-center align-items-center vh-100">
+            <div className="card shadow-lg p-4 rounded-4" style={{ maxWidth: "450px", width: "100%" }}>
+                <h3 className="text-center mb-3">Employer Registration</h3>
 
-                <input type="text" name="name" placeholder="Enter your name" required />
-                <input type="email" name="email" placeholder="Enter your email" required />
-                <input type="password" name="password" placeholder="Enter your password" required />
-                <input type="text" name="city" placeholder="Enter your city" required />
-                <input type="tel" name="mobileNo" placeholder="Enter your mobile number" required />
+                <form onSubmit={submit}>
+                
 
-                <input type="submit" value="Register" />
-            </form>
-        </>
+                    <div className="mb-3">
+                        <label className="form-label">Email</label>
+                        <input type="email" name="email" className="form-control" required />
+                    </div>
+
+                    <div className="mb-3">
+                        <label className="form-label">Password</label>
+                        <input type="password" name="password" className="form-control" required />
+                    </div>
+
+                    <button className="btn btn-success w-100">
+                        Register
+                    </button>
+                </form>
+            </div>
+        </div>
     );
 }
 

@@ -8,7 +8,6 @@ function PostJobPage() {
 
     function addSkill() {
         const trimmedSkill = skillInput.trim();
-
         if (trimmedSkill !== "" && !skills.includes(trimmedSkill)) {
             setSkills([...skills, trimmedSkill]);
             setSkillInput("");
@@ -49,67 +48,90 @@ function PostJobPage() {
     }
 
     return (
-        <>
-            <h2>Post a Job</h2>
+        <div className="container mt-4">
 
-            <form onSubmit={submitJob}>
-
-                <input type="text" name="jobRole" placeholder="Job Role" required />
-
-                <textarea
-                    name="description"
-                    placeholder="Job Description"
-                    required
-                ></textarea>
-
-                <h4>Skills Required</h4>
-
-                <input
-                    type="text"
-                    placeholder="Type skill and click Add"
-                    value={skillInput}
-                    onChange={(e) => setSkillInput(e.target.value)}
-                />
-
-                <button type="button" onClick={addSkill}>Add Skill</button>
-
-                <div style={{ marginTop: "10px" }}>
-                    {skills.map((skill, index) => (
-                        <span
-                            key={index}
-                            style={{
-                                border: "1px solid #000",
-                                padding: "5px",
-                                margin: "5px",
-                                display: "inline-block"
-                            }}
-                        >
-                            {skill}
-                            <button
-                                type="button"
-                                onClick={() => removeSkill(skill)}
-                                style={{ marginLeft: "5px" }}
-                            >
-                                ❌
-                            </button>
-                        </span>
-                    ))}
+            <div className="card shadow">
+                <div className="card-header bg-primary text-white">
+                    <h4 className="mb-0">Post a Job</h4>
                 </div>
 
-                <br />
+                <div className="card-body">
+                    <form onSubmit={submitJob}>
 
-                <input type="number" name="salary" placeholder="Salary" required />
-                <input type="number" name="position" placeholder="No. of Positions" required />
-                <input type="text" name="companyName" placeholder="Company Name" required />
-                <input type="tel" name="mobileNo" placeholder="Mobile Number" required />
-                <input type="text" name="city" placeholder="City" required />
+                        <div className="mb-3">
+                            <label className="form-label">Job Role</label>
+                            <input type="text" name="jobRole" className="form-control" required />
+                        </div>
 
-                <br /><br />
+                        <div className="mb-3">
+                            <label className="form-label">Job Description</label>
+                            <textarea name="description" className="form-control" rows="3" required></textarea>
+                        </div>
 
-                <input type="submit" value="Post Job" />
+                        <div className="mb-3">
+                            <label className="form-label">Skills Required</label>
+                            <div className="d-flex">
+                                <input
+                                    type="text"
+                                    className="form-control me-2"
+                                    placeholder="Type skill"
+                                    value={skillInput}
+                                    onChange={(e) => setSkillInput(e.target.value)}
+                                />
+                                <button type="button" className="btn btn-success" onClick={addSkill}>
+                                    Add
+                                </button>
+                            </div>
 
-            </form>
-        </>
+                            <div className="mt-2">
+                                {skills.map((skill, index) => (
+                                    <span key={index} className="badge bg-secondary me-2">
+                                        {skill}
+                                        <button
+                                            type="button"
+                                            className="btn-close btn-close-white ms-2"
+                                            onClick={() => removeSkill(skill)}
+                                        ></button>
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="row">
+                            <div className="col-md-6 mb-3">
+                                <label className="form-label">Salary</label>
+                                <input type="number" name="salary" className="form-control" required />
+                            </div>
+
+                            <div className="col-md-6 mb-3">
+                                <label className="form-label">Positions</label>
+                                <input type="number" name="position" className="form-control" required />
+                            </div>
+                        </div>
+
+                        <div className="mb-3">
+                            <label className="form-label">Company Name</label>
+                            <input type="text" name="companyName" className="form-control" required />
+                        </div>
+
+                        <div className="mb-3">
+                            <label className="form-label">Mobile Number</label>
+                            <input type="tel" name="mobileNo" className="form-control" required />
+                        </div>
+
+                        <div className="mb-3">
+                            <label className="form-label">City</label>
+                            <input type="text" name="city" className="form-control" required />
+                        </div>
+
+                        <button type="submit" className="btn btn-primary w-100">
+                            Post Job
+                        </button>
+
+                    </form>
+                </div>
+            </div>
+        </div>
     );
 }
 

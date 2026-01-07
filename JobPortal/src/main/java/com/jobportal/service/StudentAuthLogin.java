@@ -10,21 +10,31 @@ import com.jobportal.repository.StudentRepo;
 
 @Service
 public class StudentAuthLogin {
-@Autowired
+
+    @Autowired
     private StudentRepo studentRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public boolean login(LoginRequestStudent request) {
+    /**
+     * @return Student if login successful, null if invalid
+     */
+    public Student login(LoginRequestStudent request) {
 
         Student student = studentRepository
                 .findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElse(null);
 
-        return passwordEncoder.matches(
+        if (student == null) {
+            return null;
+        }
+
+        boolean match = passwordEncoder.matches(
                 request.getPassword(),   // raw password
-                student.getPassword()    // encoded password from DB
+                student.getPassword()    // encoded password
         );
+
+        return match ? student : null;
     }
 }

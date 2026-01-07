@@ -1,56 +1,57 @@
-import './StudentRegPage.css'
-import axios from "axios"
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 function StudentRegPage() {
+
+    const navigate = useNavigate();
+
     function submit(e) {
-          e.preventDefault()
-        let mobileNo=e.target.mobileNo.value.trim();
+        e.preventDefault();
 
-          if(isNaN(mobileNo)||(mobileNo.length!==10 && mobileNo.length!==11)){
-            alert("Please enter valid mobile no.")
-        console.log(mobileNo)
-        return
-        }
+        const data = {
+            name: e.target.name.value,
+            email: e.target.email.value,
+            password: e.target.password.value
+        };
 
-        let data={
-             name: e.target.name.value,
-             email: e.target.email.value,
-             password: e.target.password.value,
-             mobileNo: e.target.mobileNo.value,
-             workingStatus: e.target.workingStatus.value
-        }
-        
-      axios.post("http://localhost:8080/api/students/register",data).
-      then(res =>{
-        console.log(res.data)
-        alert("Student registered successfully")
-      })
-      .catch(err =>{
-        if(err.response){
-            alert(err.response.data)
-        }
-        else{
-            alert("Server not reachable...")
-        }
-      })
-
+        axios.post("http://localhost:8080/api/students/register", data)
+            .then(() => {
+                alert("Registration successful");
+                navigate("/login");
+            })
+            .catch((err) => {
+                alert(err.response?.data || "Registration failed");
+            });
     }
-  return (
-    <div id="main-div" >
-        <h1>Student Registeration</h1>
-      <form method="post" onSubmit={submit}>
-        <input name="name" placeholder="Enter your Name" required/>
-        <input type="email" name="email" placeholder="Enter email" required/>
-        <input required type="password" name="password" placeholder="Enter Password"  />
-        <input required type="tel" name="mobileNo" placeholder="Enter Mobile No: " />
-        <div>
-            Fresher<input required type="radio" name="workingStatus" value="fresher" />
-        Experience<input required type="radio" name="workingStatus" value="experience" />
-        </div>
-        <input type="submit" value="Register Now" />
-      </form>
 
-    </div>
-  )
+    return (
+        <div className="container d-flex justify-content-center align-items-center vh-100">
+            <div className="card shadow-lg p-4 rounded-4" style={{ maxWidth: "450px", width: "100%" }}>
+                <h3 className="text-center mb-3">Student Registration</h3>
+
+                <form onSubmit={submit}>
+                    <div className="mb-3">
+                        <label className="form-label">Full Name</label>
+                        <input type="text" name="name" className="form-control" required />
+                    </div>
+
+                    <div className="mb-3">
+                        <label className="form-label">Email</label>
+                        <input type="email" name="email" className="form-control" required />
+                    </div>
+
+                    <div className="mb-3">
+                        <label className="form-label">Password</label>
+                        <input type="password" name="password" className="form-control" required />
+                    </div>
+
+                    <button className="btn btn-primary w-100">
+                        Register
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
 }
 
-export default StudentRegPage
+export default StudentRegPage;

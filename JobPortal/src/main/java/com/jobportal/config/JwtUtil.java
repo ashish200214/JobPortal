@@ -1,8 +1,10 @@
 package com.jobportal.config;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+
 import java.security.Key;
 import java.util.Date;
 
@@ -11,55 +13,66 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtUtil {
 
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    // 🔐 STATIC SECRET (DO NOT CHANGE)
+    private static final String SECRET =
+            "jobportal-secret-key-jobportal-secret-key-123456";
 
-    // EMPLOYEE TOKEN
-    public String generateToken(Long empId, String email) {
+    private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
+
+    private static final long EXPIRATION_TIME = 60 * 60 * 1000; // 1 hour
+
+    // ================= EMPLOYEE TOKEN =================
+    public String generateEmployeeToken(Long empId, String email) {
         return Jwts.builder()
                 .setSubject(email)
                 .claim("empId", empId)
                 .claim("role", "EMPLOYEE")
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 60 * 60 * 1000))
-                .signWith(key)
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // STUDENT TOKEN
-    public String generateStudentToken(String email) {
+    // ================= STUDENT TOKEN =================
+    public String generateStudentToken(Long studentId, String email) {
         return Jwts.builder()
                 .setSubject(email)
+                .claim("studentId", studentId)
                 .claim("role", "STUDENT")
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 60 * 60 * 1000))
-                .signWith(key)
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String extractEmail(String token) {
+    // ================= COMMON =================
+    private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
-
-    public Long extractEmpId(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .get("empId", Long.class);
+                .getBody();
     }
 
     public String extractRole(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .get("role", String.class);
+        return extractAllClaims(token).get("role", String.class);
+    }
+
+    public Long extractEmpId(String token) {
+        return extractAllClaims(token).get("empId", Long.class);
+    }
+
+    public Long extractStudentId(String token) {
+        return extractAllClaims(token).get("studentId", Long.class);
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            return extractAllClaims(token)
+                    .getExpiration()
+                    .after(new Date());
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

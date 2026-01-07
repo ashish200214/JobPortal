@@ -28,25 +28,32 @@ public class SecurityConfig {
             .httpBasic(basic -> basic.disable())
 
             .authorizeHttpRequests(auth -> auth
-                // PUBLIC
+
+                // 🔓 PUBLIC AUTH & REGISTRATION
                 .requestMatchers(
-                        "/api/auth/student/**",
-                        "/api/auth/employee/**"
+                    "/api/auth/student/**",
+                    "/api/auth/employee/**",
+                    "/api/students/register/**",
+                    "/api/employee/register/**"
                 ).permitAll()
 
+                // 🔓 PUBLIC JOB SEARCH
+                .requestMatchers(HttpMethod.GET, "/api/job/search").permitAll()
+
+                // 🔓 PREFLIGHT (CORS)
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                // PROTECTED
-                .requestMatchers("/api/job/**").authenticated()
-
+                // 🔒 EVERYTHING ELSE
                 .anyRequest().authenticated()
             )
 
+            // JWT FILTER
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
+    // ✅ ADD THIS (PERMANENT FIX)
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

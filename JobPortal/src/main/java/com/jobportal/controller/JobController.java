@@ -1,5 +1,7 @@
 package com.jobportal.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import com.jobportal.dto.JobDTO;
 import com.jobportal.entity.Job;
 import com.jobportal.repository.JobRepo;
+import com.jobportal.service.JobService;
 
 @RestController
 @RequestMapping("/api/job")
@@ -16,6 +19,9 @@ public class JobController {
 
     @Autowired
     private JobRepo jobRepository;
+
+    @Autowired
+private JobService jobService;
 
     @PostMapping
     public ResponseEntity<?> addJob(
@@ -45,4 +51,18 @@ public class JobController {
 
         return ResponseEntity.ok("Job posted successfully");
     }
+
+    @GetMapping("/search")
+public ResponseEntity<List<Job>> searchJobs(
+        @RequestParam(required = false) String keyword,
+        @RequestParam(required = false) String location,
+        @RequestParam(required = false) String industry,
+        @RequestParam(required = false) Double minSalary,
+        @RequestParam(required = false) Double maxSalary
+) {
+    return ResponseEntity.ok(jobService.searchJobs(
+        keyword, location, industry, minSalary, maxSalary
+    ));
+}
+
 }
