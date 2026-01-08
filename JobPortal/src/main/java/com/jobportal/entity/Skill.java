@@ -2,24 +2,22 @@ package com.jobportal.entity;
 
 import java.util.List;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.*;
 import lombok.Data;
 
-@Data
 @Entity
+@Data
 public class Skill {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
-        private String skillName;
+    private Long id;
+
+    private String name;   // 🔥 REQUIRED
+
     @ManyToMany(mappedBy = "skills")
-private List<Student> students;
-@ManyToMany(mappedBy = "skills")
-private List<Job> jobs;
-
-
+    @JsonIgnore
+    private List<Job> jobs;
 }

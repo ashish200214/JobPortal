@@ -2,37 +2,38 @@ package com.jobportal.entity;
 
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.*;
 import lombok.Data;
 
-@Data   
 @Entity
-
+@Data
 public class Job {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-private Long id;
+    private Long id;
 
-private Long emp_id;
-private String jobRole;
-@ManyToMany(cascade = CascadeType.ALL)
-@JoinTable(
+    private String jobRole;
+    private String description;
+    private Double salary;
+    private Integer openings; // ✅ NUMBER OF VACANCIES
+    private String companyName;
+    private String mobileNo;
+    private String city;
+
+    @ManyToMany
+    @JsonIgnore
+    @JoinTable(
         name = "job_skills",
         joinColumns = @JoinColumn(name = "job_id"),
         inverseJoinColumns = @JoinColumn(name = "skill_id")
     )
-private List<Skill> skills;
-private String description;
-private Double salary;
-private Double position;
-private String companyName;
-private String mobileNo;
-private String city;
+    private List<Skill> skills;
+
+    @ManyToOne
+    @JoinColumn(name = "employee_id")
+    @JsonIgnore
+    private Employee employee;
 }

@@ -1,9 +1,10 @@
 package com.jobportal.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -19,4 +20,8 @@ public class Employee {
     private String password;
     private String city;
     private String mobileNo;
+
+    @OneToMany(mappedBy = "employee")
+    @JsonIgnore
+    private List<Job> jobs;
 }

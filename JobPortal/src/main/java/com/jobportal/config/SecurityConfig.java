@@ -38,7 +38,7 @@ public class SecurityConfig {
                 ).permitAll()
 
                 // 🔓 PUBLIC JOB SEARCH
-                .requestMatchers(HttpMethod.GET, "/api/job/search").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/job/**").permitAll()
 
                 // 🔓 PREFLIGHT (CORS)
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()

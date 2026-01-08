@@ -1,21 +1,21 @@
 import { Routes, Route } from "react-router-dom";
 
-// COMMON
+/* COMMON */
+import Navbar from "./assets/NavBar";
+import HomePage from "./assets/HomePage";
 
-// STUDENT
+/* STUDENT */
 import Login from "./assets/Login";
 import StudentRegPage from "./StudentRegPage";
-import JobList from "./assets/JobList";
+import StudentHomePage from "./assets/StudentHomePage";
 import StudentDashboard from "./assets/StudentDashboard";
+import JobList from "./assets/JobList";
 
-// EMPLOYEE
+/* EMPLOYEE */
 import EmployeeRegister from "./assets/EmployeeRegister";
 import EmployeeLogin from "./assets/EmployeeLogin";
 import EmployeeHomePage from "./assets/EmployeeHomePage";
 import PostJobPage from "./assets/PostJobPage";
-import HomePage from "./assets/HomePage";
-import Navbar from "./assets/NavBar";
-import StudentHomePage from "./assets/StudentHomePage";
 
 function App() {
   return (
@@ -24,15 +24,17 @@ function App() {
 
       <Routes>
 
-        {/* STUDENT ROUTES */}
+        {/* ===== PUBLIC ===== */}
         <Route path="/" element={<HomePage />} />
-        <Route path="/student/home" element={<StudentHomePage />} />
+
+        {/* ===== STUDENT ===== */}
         <Route path="/login" element={<Login />} />
         <Route path="/registration" element={<StudentRegPage />} />
+        <Route path="/student/home" element={<StudentHomePage />} />
         <Route path="/student/dashboard" element={<StudentDashboard />} />
         <Route path="/jobs" element={<JobList />} />
 
-        {/* EMPLOYEE ROUTES */}
+        {/* ===== EMPLOYEE ===== */}
         <Route path="/employee/register" element={<EmployeeRegister />} />
         <Route path="/employee/login" element={<EmployeeLogin />} />
         <Route path="/employee/home" element={<EmployeeHomePage />} />
@@ -44,3 +46,4 @@ function App() {
 }
 
 export default App;
+  
