@@ -40,4 +40,12 @@ public class EmployeeService {
 
         return emp;
     }
+
+    public Employee getEmployeeById(Long id) {
+        
+        Employee employee = employeeRepo.findById(id)
+        .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        return employee;
+    }
 }

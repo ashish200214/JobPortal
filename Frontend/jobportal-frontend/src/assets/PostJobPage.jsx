@@ -1,136 +1,182 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function PostJobPage() {
 
+    const navigate = useNavigate();
+
+    const [jobRole, setJobRole] = useState("");
+    const [description, setDescription] = useState("");
+    const [salary, setSalary] = useState("");
+    const [openings, setOpenings] = useState("");
+    const [companyName, setCompanyName] = useState("");
+    const [mobileNo, setMobileNo] = useState("");
+    const [city, setCity] = useState("");
+
+    // ✅ skills as ARRAY (same as backend expects)
     const [skillInput, setSkillInput] = useState("");
     const [skills, setSkills] = useState([]);
 
     function addSkill() {
-        const trimmedSkill = skillInput.trim();
-        if (trimmedSkill !== "" && !skills.includes(trimmedSkill)) {
-            setSkills([...skills, trimmedSkill]);
-            setSkillInput("");
+        if (skillInput.trim() === "") return;
+        setSkills([...skills, skillInput.trim()]);
+        setSkillInput("");
+    }
+
+    function removeSkill(index) {
+        setSkills(skills.filter((_, i) => i !== index));
+    }
+
+    async function submitJob(e) {
+        e.preventDefault();
+
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            alert("Please login again");
+            navigate("/employee/login");
+            return;
+        }
+
+        try {
+            await axios.post(
+                "http://localhost:8080/api/job",
+                {
+                    jobRole,
+                    description,
+                    skills,        // ✅ unchanged
+                    salary,
+                    openings,
+                    companyName,
+                    mobileNo,
+                    city
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            alert("Job posted successfully");
+            navigate("/employee/home");
+
+        } catch (err) {
+            console.error(err);
+            alert("Failed to post job");
         }
     }
 
-    function removeSkill(skillToRemove) {
-        setSkills(skills.filter(skill => skill !== skillToRemove));
-    }
-
-    function submitJob(e) {
-        e.preventDefault();
-
-        const data = {
-            jobRole: e.target.jobRole.value,
-            description: e.target.description.value,
-            salary: e.target.salary.value,
-            position: e.target.position.value,
-            companyName: e.target.companyName.value,
-            mobileNo: e.target.mobileNo.value,
-            city: e.target.city.value,
-            skills: skills.map(skill => ({ name: skill }))
-        };
-
-        axios.post("http://localhost:8080/api/job", data, {
-            headers: {
-                Authorization: "Bearer " + localStorage.getItem("token")
-            }
-        })
-        .then(() => {
-            alert("Job posted successfully");
-            e.target.reset();
-            setSkills([]);
-        })
-        .catch(() => {
-            alert("Error posting job");
-        });
-    }
-
     return (
-        <div className="container mt-4">
+        <div className="container mt-5">
+            <h3 className="mb-4">Post New Job</h3>
 
-            <div className="card shadow">
-                <div className="card-header bg-primary text-white">
-                    <h4 className="mb-0">Post a Job</h4>
-                </div>
+            <form onSubmit={submitJob}>
 
-                <div className="card-body">
-                    <form onSubmit={submitJob}>
+                {/* JOB ROLE */}
+                <input
+                    className="form-control mb-2"
+                    placeholder="Job Role"
+                    value={jobRole}
+                    onChange={e => setJobRole(e.target.value)}
+                    required
+                />
 
-                        <div className="mb-3">
-                            <label className="form-label">Job Role</label>
-                            <input type="text" name="jobRole" className="form-control" required />
-                        </div>
+                {/* JOB DESCRIPTION */}
+                <textarea
+                    className="form-control mb-3"
+                    placeholder="Job Description"
+                    value={description}
+                    onChange={e => setDescription(e.target.value)}
+                    required
+                />
 
-                        <div className="mb-3">
-                            <label className="form-label">Job Description</label>
-                            <textarea name="description" className="form-control" rows="3" required></textarea>
-                        </div>
-
-                        <div className="mb-3">
-                            <label className="form-label">Skills Required</label>
-                            <div className="d-flex">
-                                <input
-                                    type="text"
-                                    className="form-control me-2"
-                                    placeholder="Type skill"
-                                    value={skillInput}
-                                    onChange={(e) => setSkillInput(e.target.value)}
-                                />
-                                <button type="button" className="btn btn-success" onClick={addSkill}>
-                                    Add
-                                </button>
-                            </div>
-
-                            <div className="mt-2">
-                                {skills.map((skill, index) => (
-                                    <span key={index} className="badge bg-secondary me-2">
-                                        {skill}
-                                        <button
-                                            type="button"
-                                            className="btn-close btn-close-white ms-2"
-                                            onClick={() => removeSkill(skill)}
-                                        ></button>
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="row">
-                            <div className="col-md-6 mb-3">
-                                <label className="form-label">Salary</label>
-                                <input type="number" name="salary" className="form-control" required />
-                            </div>
-
-                            <div className="col-md-6 mb-3">
-                                <label className="form-label">Positions</label>
-                                <input type="number" name="position" className="form-control" required />
-                            </div>
-                        </div>
-
-                        <div className="mb-3">
-                            <label className="form-label">Company Name</label>
-                            <input type="text" name="companyName" className="form-control" required />
-                        </div>
-
-                        <div className="mb-3">
-                            <label className="form-label">Mobile Number</label>
-                            <input type="tel" name="mobileNo" className="form-control" required />
-                        </div>
-
-                        <div className="mb-3">
-                            <label className="form-label">City</label>
-                            <input type="text" name="city" className="form-control" required />
-                        </div>
-
-                        <button type="submit" className="btn btn-primary w-100">
-                            Post Job
+                {/* ===== SKILLS (AFTER DESCRIPTION) ===== */}
+                <div className="mb-2">
+                    <label className="form-label fw-semibold">Skills</label>
+                    <div className="d-flex">
+                        <input
+                            className="form-control"
+                            placeholder="Add skill (e.g. Java)"
+                            value={skillInput}
+                            onChange={e => setSkillInput(e.target.value)}
+                        />
+                        <button
+                            type="button"
+                            className="btn btn-secondary ms-2"
+                            onClick={addSkill}
+                        >
+                            Add
                         </button>
-
-                    </form>
+                    </div>
                 </div>
-            </div>
+
+                <div className="mb-3">
+                    {skills.map((skill, index) => (
+                        <span
+                            key={index}
+                            className="badge bg-primary me-2"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => removeSkill(index)}
+                        >
+                            {skill} ✕
+                        </span>
+                    ))}
+                </div>
+
+                {/* SALARY */}
+                <input
+                    className="form-control mb-2"
+                    type="number"
+                    placeholder="Salary"
+                    value={salary}
+                    onChange={e => setSalary(e.target.value)}
+                    required
+                />
+
+                {/* OPENINGS */}
+                <input
+                    className="form-control mb-2"
+                    type="number"
+                    placeholder="Openings"
+                    value={openings}
+                    onChange={e => setOpenings(e.target.value)}
+                    required
+                />
+
+                {/* COMPANY NAME */}
+                <input
+                    className="form-control mb-2"
+                    placeholder="Company Name"
+                    value={companyName}
+                    onChange={e => setCompanyName(e.target.value)}
+                    required
+                />
+
+                {/* MOBILE */}
+                <input
+                    className="form-control mb-2"
+                    placeholder="Mobile Number"
+                    value={mobileNo}
+                    onChange={e => setMobileNo(e.target.value)}
+                    required
+                />
+
+                {/* CITY */}
+                <input
+                    className="form-control mb-3"
+                    placeholder="City"
+                    value={city}
+                    onChange={e => setCity(e.target.value)}
+                    required
+                />
+
+                <button className="btn btn-primary w-100">
+                    Post Job
+                </button>
+
+            </form>
         </div>
     );
 }

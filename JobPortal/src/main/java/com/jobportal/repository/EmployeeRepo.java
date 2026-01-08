@@ -10,4 +10,5 @@ import com.jobportal.entity.Employee;
 public interface EmployeeRepo extends JpaRepository<Employee, Long> {
 
     Optional<Employee> findByEmail(String email);
+    
 }

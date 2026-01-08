@@ -24,12 +24,11 @@ public class Job {
     private String city;
 
     @ManyToMany
-    @JsonIgnore
-    @JoinTable(
-        name = "job_skills",
-        joinColumns = @JoinColumn(name = "job_id"),
-        inverseJoinColumns = @JoinColumn(name = "skill_id")
-    )
+@JoinTable(
+    name = "job_skills",
+    joinColumns = @JoinColumn(name = "job_id"),
+    inverseJoinColumns = @JoinColumn(name = "skill_id")
+)
     private List<Skill> skills;
 
     @ManyToOne

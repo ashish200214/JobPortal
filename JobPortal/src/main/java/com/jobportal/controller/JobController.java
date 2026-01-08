@@ -9,9 +9,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import com.jobportal.dto.JobDTO;
+import com.jobportal.entity.Employee;
 import com.jobportal.entity.Job;
 import com.jobportal.mapper.JobMapper;
-import com.jobportal.repository.JobRepo;
+import com.jobportal.repository.SkillRepo;
+import com.jobportal.service.EmployeeService;
 import com.jobportal.service.JobService;
 
 @RestController
@@ -23,17 +25,23 @@ public class JobController {
     private JobService jobService;
 
     @Autowired
-    private JobRepo jobRepo;
+    private EmployeeService employeeService;
+
+    @Autowired
+    private SkillRepo skillRepo;
 
     // ==================================================
     // ✅ PUBLIC – GET ALL JOBS
     // ==================================================
     @GetMapping("/all")
-    public List<JobDTO> getAllJobs() {
-        return jobService.allJobs()
+    public ResponseEntity<List<JobDTO>> getAllJobs() {
+
+        List<JobDTO> jobs = jobService.allJobs()
                 .stream()
                 .map(JobMapper::jobToJobDTO)
                 .collect(Collectors.toList());
+
+        return ResponseEntity.ok(jobs);
     }
 
     // ==================================================
@@ -64,15 +72,42 @@ public class JobController {
             @RequestBody JobDTO dto,
             Authentication authentication) {
 
-        // 🔐 Ensure employee is logged in
         if (authentication == null || !(authentication.getPrincipal() instanceof Long)) {
             return ResponseEntity.status(403).body("Unauthorized");
         }
 
-        Job job = JobMapper.jobDTOToJob(dto);
+        Long empId = (Long) authentication.getPrincipal();
 
-        jobRepo.save(job);
+        Employee employee = employeeService.getEmployeeById(empId);
+
+        // 🔥 Convert DTO → Entity (skills handled correctly)
+        Job job = JobMapper.jobDTOToJob(dto, skillRepo);
+        job.setEmployee(employee);
+
+        jobService.save(job);
 
         return ResponseEntity.ok("Job posted successfully");
+    }
+
+    // ==================================================
+    // 🔒 EMPLOYEE – MY JOBS
+    // ==================================================
+    @GetMapping("/my-jobs")
+    public ResponseEntity<List<JobDTO>> getMyJobs(Authentication authentication) {
+
+        if (authentication == null || !(authentication.getPrincipal() instanceof Long)) {
+            return ResponseEntity.status(403).build();
+        }
+
+        Long empId = (Long) authentication.getPrincipal();
+
+        Employee employee = employeeService.getEmployeeById(empId);
+
+        List<JobDTO> jobs = jobService.getJobsByEmployee(employee)
+                .stream()
+                .map(JobMapper::jobToJobDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(jobs);
     }
 }
