@@ -1,6 +1,5 @@
 package com.jobportal.entity;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -22,10 +21,13 @@ public class Application {
     @ManyToOne
     private Job job;
 
-    // 🔥 AUTO SET WHEN RECORD IS CREATED
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime appliedDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ApplicationStatus status = ApplicationStatus.APPLIED;
 
     private String resumeFileName;
     private String resumePath;

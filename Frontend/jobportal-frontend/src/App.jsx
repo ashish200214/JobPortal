@@ -11,6 +11,7 @@ import StudentHomePage from "./assets/StudentHomePage";
 import StudentDashboard from "./assets/StudentDashboard";
 import JobList from "./assets/JobList";
 import JobApply from "./assets/JobApply";
+import StudentAppliedJobs from "./assets/StudentAppliedJob";
 
 /* ===== EMPLOYEE ===== */
 import EmployeeRegister from "./assets/EmployeeRegister";
@@ -46,6 +47,10 @@ function App() {
         <Route path="/employee/login" element={<EmployeeLogin />} />
         <Route path="/employee/home" element={<EmployeeHomePage />} />
         <Route path="/employee/post-job" element={<PostJobPage />} />
+<Route
+  path="/student/applied-jobs"
+  element={<StudentAppliedJobs />}
+/>
 
         {/* ===== FALLBACK ===== */}
         <Route
