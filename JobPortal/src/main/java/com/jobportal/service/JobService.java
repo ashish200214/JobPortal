@@ -18,6 +18,10 @@ public class JobService {
     public List<Job> allJobs() {
         return jobRepo.findAll();
     }
+    public Job getJobById(Long id) {
+    return jobRepo.findById(id)
+            .orElseThrow(() -> new RuntimeException("Job not found"));
+}
 
     public Job save(Job job) {
         return jobRepo.save(job);

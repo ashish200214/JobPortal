@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class JobDTO {
-
+    private Long id;
     private String jobRole;
     private String description;
     private Double salary;
@@ -14,7 +14,6 @@ public class JobDTO {
     private String mobileNo;
     private String city;
 
-    // 🔥 skills as List<String>
     private List<String> skills;
 }
 

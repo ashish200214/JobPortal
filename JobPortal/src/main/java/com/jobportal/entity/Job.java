@@ -24,7 +24,7 @@ public class Job {
     private String city;
 
     @ManyToMany
-@JoinTable(
+    @JoinTable(
     name = "job_skills",
     joinColumns = @JoinColumn(name = "job_id"),
     inverseJoinColumns = @JoinColumn(name = "skill_id")

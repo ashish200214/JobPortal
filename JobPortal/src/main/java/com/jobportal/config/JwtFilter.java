@@ -22,14 +22,14 @@ public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtil jwtUtil;
 
-    // 🔓 PUBLIC AUTH & JOB APIs (ANY METHOD)
+    // 🔓 PUBLIC URLs
     private static final List<String> PUBLIC_URLS = List.of(
-        "/api/auth/student",
-        "/api/auth/employee",
-        "/api/students/register",
-        "/api/employee/register",
-        "/api/job/search",
-        "/api/job/all"
+            "/api/auth/student",
+            "/api/auth/employee",
+            "/api/students/register",
+            "/api/employee/register",
+            "/api/job/search",
+            "/api/job/all"
     );
 
     @Override
@@ -42,19 +42,19 @@ public class JwtFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
-        // ✅ Allow OPTIONS (CORS)
+        // ✅ Allow OPTIONS
         if (HttpMethod.OPTIONS.matches(method)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // ✅ Allow PUBLIC URLs (LOGIN, REGISTER, PUBLIC JOB APIs)
+        // ✅ Allow public APIs
         if (PUBLIC_URLS.stream().anyMatch(path::startsWith)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 🔐 EVERYTHING ELSE NEEDS JWT
+        // 🔐 JWT REQUIRED
         String header = request.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")) {
@@ -69,17 +69,37 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        Long userId = jwtUtil.extractEmpId(token);
+        String role = jwtUtil.extractRole(token);
+        UsernamePasswordAuthenticationToken authentication;
 
-        UsernamePasswordAuthenticationToken auth =
-                new UsernamePasswordAuthenticationToken(
-                        userId,
-                        null,
-                        Collections.emptyList()
-                );
+        // ================= STUDENT =================
+        if ("STUDENT".equals(role)) {
 
-        SecurityContextHolder.getContext().setAuthentication(auth);
+            String email = jwtUtil.extractAllClaims(token).getSubject();
 
+            authentication = new UsernamePasswordAuthenticationToken(
+                    email,               // 🔥 THIS IS USED IN /api/student/me
+                    null,
+                    Collections.emptyList()
+            );
+        }
+        // ================= EMPLOYEE =================
+        else if ("EMPLOYEE".equals(role)) {
+
+            Long empId = jwtUtil.extractEmpId(token);
+
+            authentication = new UsernamePasswordAuthenticationToken(
+                    empId,
+                    null,
+                    Collections.emptyList()
+            );
+        }
+        else {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
         filterChain.doFilter(request, response);
     }
 }
