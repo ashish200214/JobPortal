@@ -1,6 +1,9 @@
 package com.jobportal.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -19,10 +22,11 @@ public class Application {
     @ManyToOne
     private Job job;
 
-    // 🔥 ADD THIS FIELD
-    private LocalDate appliedDate;
+    // 🔥 AUTO SET WHEN RECORD IS CREATED
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime appliedDate;
 
-    // (Optional – if you later add resume upload)
-     private String resumeFileName;
-     private String resumePath;
+    private String resumeFileName;
+    private String resumePath;
 }
