@@ -18,4 +18,8 @@ public interface ApplicationRepository
 
     // 🔥 EMPLOYEE → JOB APPLICANTS
     List<Application> findByJob(Job job);
+
+        List<Application> findByStudentId(Long studentId);
+List<Application> findByJobId(Long jobId);
+
 }

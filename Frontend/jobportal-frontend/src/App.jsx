@@ -18,6 +18,8 @@ import EmployeeRegister from "./assets/EmployeeRegister";
 import EmployeeLogin from "./assets/EmployeeLogin";
 import EmployeeHomePage from "./assets/EmployeeHomePage";
 import PostJobPage from "./assets/PostJobPage";
+import JobApplicants from "./assets/JobApplicants";
+
 
 function App() {
   return (
@@ -25,13 +27,12 @@ function App() {
       <Navbar />
 
       <Routes>
-
         {/* ===== PUBLIC ===== */}
         <Route path="/" element={<HomePage />} />
 
         {/* ===== STUDENT AUTH ===== */}
         <Route path="/login" element={<Login />} />
-        <Route path="/student/login" element={<Login />} /> {/* 🔥 FIX */}
+        <Route path="/student/login" element={<Login />} />
         <Route path="/registration" element={<StudentRegPage />} />
 
         {/* ===== STUDENT PAGES ===== */}
@@ -39,19 +40,24 @@ function App() {
         <Route path="/student/dashboard" element={<StudentDashboard />} />
         <Route path="/jobs" element={<JobList />} />
 
-        {/* ===== JOB APPLY ===== */}
+        {/* ===== APPLY JOB ===== */}
         <Route path="/jobapply/:jobId" element={<JobApply />} />
+
+        {/* ===== STUDENT APPLIED JOBS (IMPORTANT) ===== */}
+        <Route
+          path="/student/applied-jobs"
+          element={<StudentAppliedJobs />}
+        />
 
         {/* ===== EMPLOYEE ===== */}
         <Route path="/employee/register" element={<EmployeeRegister />} />
         <Route path="/employee/login" element={<EmployeeLogin />} />
         <Route path="/employee/home" element={<EmployeeHomePage />} />
         <Route path="/employee/post-job" element={<PostJobPage />} />
-<Route
-  path="/student/applied-jobs"
-  element={<StudentAppliedJobs />}
+        <Route
+  path="/employee/job/:jobId/applicants"
+  element={<JobApplicants />}
 />
-
         {/* ===== FALLBACK ===== */}
         <Route
           path="*"
@@ -61,7 +67,6 @@ function App() {
             </div>
           }
         />
-
       </Routes>
     </>
   );

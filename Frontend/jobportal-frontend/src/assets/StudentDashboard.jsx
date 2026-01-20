@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
 function StudentDashboard() {
-
   const navigate = useNavigate();
 
   function logout() {
@@ -11,7 +10,6 @@ function StudentDashboard() {
 
   return (
     <div className="container mt-5">
-
       {/* HEADER */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Student Dashboard</h2>
@@ -22,8 +20,7 @@ function StudentDashboard() {
 
       {/* DASHBOARD CARDS */}
       <div className="row">
-
-        {/* 🔍 BROWSE JOBS */}
+        {/* BROWSE JOBS */}
         <div className="col-md-4 mb-3">
           <div className="card shadow h-100">
             <div className="card-body text-center">
@@ -41,7 +38,7 @@ function StudentDashboard() {
           </div>
         </div>
 
-        {/* 📄 APPLIED JOBS (THIS IS THE IMPORTANT ONE) */}
+        {/* APPLIED JOBS (FIXED PATH) */}
         <div className="col-md-4 mb-3">
           <div className="card shadow h-100 border-success">
             <div className="card-body text-center">
@@ -59,7 +56,7 @@ function StudentDashboard() {
           </div>
         </div>
 
-        {/* 👤 PROFILE (KEEP FOR FUTURE) */}
+        {/* PROFILE */}
         <div className="col-md-4 mb-3">
           <div className="card shadow h-100">
             <div className="card-body text-center">
@@ -67,16 +64,12 @@ function StudentDashboard() {
               <p className="card-text">
                 View or update your profile details.
               </p>
-              <button
-                className="btn btn-secondary"
-                disabled
-              >
+              <button className="btn btn-secondary" disabled>
                 Coming Soon
               </button>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

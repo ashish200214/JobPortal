@@ -1,6 +1,5 @@
 package com.jobportal.controller;
 
-
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +25,9 @@ public class StudentApplicationController {
     @GetMapping
     public List<Application> myApplications(Authentication authentication) {
 
-        String email = authentication.getName();
+        Long studentId = (Long) authentication.getPrincipal();
 
-        Student student = studentRepo.findByEmail(email)
+        Student student = studentRepo.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
 
         return applicationRepo.findByStudent(student);

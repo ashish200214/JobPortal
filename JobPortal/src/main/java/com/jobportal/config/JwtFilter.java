@@ -22,14 +22,13 @@ public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtil jwtUtil;
 
-    // 🔓 PUBLIC URLs
     private static final List<String> PUBLIC_URLS = List.of(
-            "/api/auth/student",
-            "/api/auth/employee",
-            "/api/students/register",
-            "/api/employee/register",
-            "/api/job/search",
-            "/api/job/all"
+        "/api/auth/student",
+        "/api/auth/employee",
+        "/api/students/register",
+        "/api/employee/register",
+        "/api/job/search",
+        "/api/job/all"
     );
 
     @Override
@@ -42,19 +41,16 @@ public class JwtFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
-        // ✅ Allow OPTIONS
         if (HttpMethod.OPTIONS.matches(method)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // ✅ Allow public APIs
         if (PUBLIC_URLS.stream().anyMatch(path::startsWith)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 🔐 JWT REQUIRED
         String header = request.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")) {
@@ -74,18 +70,16 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // ================= STUDENT =================
         if ("STUDENT".equals(role)) {
-
-            String email = jwtUtil.extractAllClaims(token).getSubject();
+            Long studentId = jwtUtil.extractStudentId(token);
 
             authentication = new UsernamePasswordAuthenticationToken(
-                    email,               // 🔥 THIS IS USED IN /api/student/me
+                    studentId,
                     null,
                     Collections.emptyList()
             );
         }
         // ================= EMPLOYEE =================
         else if ("EMPLOYEE".equals(role)) {
-
             Long empId = jwtUtil.extractEmpId(token);
 
             authentication = new UsernamePasswordAuthenticationToken(
@@ -93,8 +87,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     null,
                     Collections.emptyList()
             );
-        }
-        else {
+        } else {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
