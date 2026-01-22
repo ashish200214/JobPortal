@@ -41,6 +41,13 @@ public class EmployeeService {
         return emp;
     }
 
+
+    public Employee getEmployeeByEmail(String email) {
+        return employeeRepo.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("Employee not found with email: " + email));
+    }
+
     public Employee getEmployeeById(Long id) {
         
         Employee employee = employeeRepo.findById(id)
@@ -48,4 +55,5 @@ public class EmployeeService {
 
         return employee;
     }
+    
 }

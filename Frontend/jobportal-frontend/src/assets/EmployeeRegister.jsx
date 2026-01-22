@@ -13,7 +13,8 @@ function EmployeeRegister() {
             password: e.target.password.value
         };
 
-        axios.post("http://localhost:8080/api/employee/register", data)
+        // ✅ FIXED URL
+        axios.post("http://localhost:8080/api/auth/employee/register", data)
             .then(() => {
                 alert("Employer registered successfully");
                 navigate("/employee/login");
@@ -29,7 +30,6 @@ function EmployeeRegister() {
                 <h3 className="text-center mb-3">Employer Registration</h3>
 
                 <form onSubmit={submit}>
-                
 
                     <div className="mb-3">
                         <label className="form-label">Email</label>

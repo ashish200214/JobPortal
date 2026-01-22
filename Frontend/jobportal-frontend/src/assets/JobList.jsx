@@ -44,7 +44,7 @@ function JobList() {
 
   function applyForJob(jobId) {
     const token = localStorage.getItem("token");
-
+    
     if (!token) {
       navigate("/student/login");
       return;

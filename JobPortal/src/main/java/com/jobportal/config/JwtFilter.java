@@ -1,20 +1,19 @@
 package com.jobportal.config;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -23,12 +22,10 @@ public class JwtFilter extends OncePerRequestFilter {
     private JwtUtil jwtUtil;
 
     private static final List<String> PUBLIC_URLS = List.of(
-        "/api/auth/student",
-        "/api/auth/employee",
-        "/api/students/register",
-        "/api/employee/register",
-        "/api/job/search",
-        "/api/job/all"
+            "/api/auth/student",
+            "/api/auth/employee",
+            "/api/student/auth",
+            "/api/job/search"
     );
 
     @Override
@@ -39,14 +36,9 @@ public class JwtFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
-        String method = request.getMethod();
 
-        if (HttpMethod.OPTIONS.matches(method)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        if (PUBLIC_URLS.stream().anyMatch(path::startsWith)) {
+        if (HttpMethod.OPTIONS.matches(request.getMethod())
+                || PUBLIC_URLS.stream().anyMatch(path::startsWith)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -54,43 +46,25 @@ public class JwtFilter extends OncePerRequestFilter {
         String header = request.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
         String token = header.substring(7);
 
         if (!jwtUtil.validateToken(token)) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
         String role = jwtUtil.extractRole(token);
-        UsernamePasswordAuthenticationToken authentication;
 
-        // ================= STUDENT =================
-        if ("STUDENT".equals(role)) {
-            Long studentId = jwtUtil.extractStudentId(token);
-
-            authentication = new UsernamePasswordAuthenticationToken(
-                    studentId,
-                    null,
-                    Collections.emptyList()
-            );
-        }
-        // ================= EMPLOYEE =================
-        else if ("EMPLOYEE".equals(role)) {
-            Long empId = jwtUtil.extractEmpId(token);
-
-            authentication = new UsernamePasswordAuthenticationToken(
-                    empId,
-                    null,
-                    Collections.emptyList()
-            );
-        } else {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            return;
-        }
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(
+                        jwtUtil.extractAllClaims(token).getSubject(),
+                        null,
+                        List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         filterChain.doFilter(request, response);

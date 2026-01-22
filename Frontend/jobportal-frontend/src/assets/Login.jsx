@@ -2,7 +2,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
-
   const navigate = useNavigate();
 
   function submit(e) {
@@ -10,14 +9,15 @@ function Login() {
 
     const data = {
       email: e.target.email.value,
-      password: e.target.password.value
+      password: e.target.password.value,
     };
 
-    axios
-      .post("http://localhost:8080/api/auth/student/login", data)
-      .then((res) => {
+    // 🔥 CLEAR OLD LOGIN (EMPLOYEE → STUDENT SWITCH SAFE)
+    localStorage.clear();
 
-        // 🔥 BACKEND RETURNS STRING TOKEN (CONFIRMED)
+    axios
+      .post("http://localhost:8080/api/student/auth/login", data)
+      .then((res) => {
         const token = res.data;
 
         if (!token) {
@@ -25,22 +25,24 @@ function Login() {
           return;
         }
 
+        // ✅ REQUIRED FOR SECURITY + ROUTING
         localStorage.setItem("token", token);
         localStorage.setItem("role", "STUDENT");
 
-        console.log("TOKEN STORED =", token);
-        console.log("ROLE STORED =", localStorage.getItem("role"));
-
+        alert("Login successful");
         navigate("/student/home");
       })
-      .catch(() => {
-        alert("Invalid email or password");
+      .catch((err) => {
+        alert(err.response?.data || "Login failed");
       });
   }
 
   return (
     <div className="container d-flex justify-content-center align-items-center vh-100">
-      <div className="card shadow-lg p-4 rounded-4" style={{ maxWidth: "400px", width: "100%" }}>
+      <div
+        className="card shadow-lg p-4 rounded-4"
+        style={{ maxWidth: "450px", width: "100%" }}
+      >
         <h3 className="text-center mb-3">Student Login</h3>
 
         <form onSubmit={submit}>
@@ -51,12 +53,15 @@ function Login() {
 
           <div className="mb-3">
             <label className="form-label">Password</label>
-            <input type="password" name="password" className="form-control" required />
+            <input
+              type="password"
+              name="password"
+              className="form-control"
+              required
+            />
           </div>
 
-          <button className="btn btn-primary w-100">
-            Login
-          </button>
+          <button className="btn btn-success w-100">Login</button>
         </form>
       </div>
     </div>

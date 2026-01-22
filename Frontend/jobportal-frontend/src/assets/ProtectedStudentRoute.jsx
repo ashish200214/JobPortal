@@ -1,15 +1,15 @@
 import { Navigate } from "react-router-dom";
 
 function ProtectedStudentRoute({ children }) {
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
 
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
+  // 🔥 BOTH REQUIRED
+  if (!token || role !== "STUDENT") {
+    return <Navigate to="/login" replace />;
+  }
 
-    if (!token || role !== "STUDENT") {
-        return <Navigate to="/login" />;
-    }
-
-    return children;
+  return children;
 }
 
 export default ProtectedStudentRoute;

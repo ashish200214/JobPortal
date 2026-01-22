@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import api from "../axios";
 
 function JobApplicants() {
 
@@ -8,79 +8,43 @@ function JobApplicants() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const token = localStorage.getItem("token");
-
   useEffect(() => {
-    axios.get(
-      `http://localhost:8080/api/employee/applications/job/${jobId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    )
-    .then(res => setApplications(res.data))
-    .catch(err => console.error(err))
-    .finally(() => setLoading(false));
+    api.get(`/api/employee/applications/job/${jobId}`)
+      .then(res => setApplications(res.data))
+      .catch(err => console.error(err))
+      .finally(() => setLoading(false));
   }, [jobId]);
 
   async function updateStatus(appId, status) {
     try {
-      await axios.put(
-        `http://localhost:8080/api/employee/applications/${appId}/status?status=${status}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
+      await api.put(`/api/employee/applications/${appId}/status`, null, {
+        params: { status }
+      });
 
       setApplications(prev =>
-        prev.map(app =>
-          app.id === appId ? { ...app, status } : app
-        )
+        prev.map(a => a.id === appId ? { ...a, status } : a)
       );
-
-    } catch (err) {
+    } catch {
       alert("Failed to update status");
     }
   }
 
-  if (loading) {
-    return <p className="text-center mt-5">Loading applicants...</p>;
-  }
+  if (loading) return <p>Loading...</p>;
 
   return (
     <div className="container mt-4">
       <h3>Job Applicants</h3>
-
-      {applications.length === 0 && (
-        <p className="text-muted">No applications yet.</p>
-      )}
-
       {applications.map(app => (
-        <div key={app.id} className="card p-3 mb-3 shadow">
+        <div key={app.id} className="card p-3 mb-3">
           <h5>{app.student?.name}</h5>
-          <p>Email: {app.student?.email}</p>
+          <p>{app.student?.email}</p>
           <p>Status: <b>{app.status}</b></p>
 
           {app.status === "APPLIED" && (
-            <div className="d-flex gap-2">
-              <button
-                className="btn btn-success"
-                onClick={() => updateStatus(app.id, "SELECTED")}
-              >
-                Accept
-              </button>
-
-              <button
-                className="btn btn-danger"
-                onClick={() => updateStatus(app.id, "REJECTED")}
-              >
-                Reject
-              </button>
-            </div>
+            <>
+              <button onClick={() => updateStatus(app.id, "SELECTED")} className="btn btn-success me-2">Accept</button>
+              <button onClick={() => updateStatus(app.id, "REJECTED")} className="btn btn-danger">Reject</button>
+            </>
           )}
         </div>
       ))}

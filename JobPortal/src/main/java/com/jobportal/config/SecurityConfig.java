@@ -22,38 +22,47 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+            // ===== BASIC CONFIG =====
             .cors(cors -> {})
             .csrf(csrf -> csrf.disable())
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable())
 
+            // ===== AUTHORIZATION =====
             .authorizeHttpRequests(auth -> auth
 
-                // 🔓 PUBLIC AUTH & REGISTRATION
+                // 🔓 PUBLIC AUTH ENDPOINTS
                 .requestMatchers(
-                    "/api/auth/student/**",
-                    "/api/auth/employee/**",
-                    "/api/students/register/**",
-                    "/api/employee/register/**"
+                        "/api/auth/student/**",
+                        "/api/auth/employee/**",
+                        "/api/student/auth/**",
+                        "/api/employee/register/**"
                 ).permitAll()
 
-                // 🔓 PUBLIC JOB SEARCH
+                // 🔓 PUBLIC JOB SEARCH / VIEW
                 .requestMatchers(HttpMethod.GET, "/api/job/**").permitAll()
 
-                // 🔓 PREFLIGHT (CORS)
+                // 🔒 EMPLOYEE ONLY
+                .requestMatchers(HttpMethod.POST, "/api/job/**").hasRole("EMPLOYEE")
+                .requestMatchers("/api/employee/**").hasRole("EMPLOYEE")
+
+                // 🔒 STUDENT ONLY
+                .requestMatchers("/api/student/**").hasRole("STUDENT")
+
+                // 🔓 CORS PREFLIGHT
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                 // 🔒 EVERYTHING ELSE
                 .anyRequest().authenticated()
             )
 
-            // JWT FILTER
+            // ===== JWT FILTER =====
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // ✅ ADD THIS (PERMANENT FIX)
+    // ===== PASSWORD ENCODER =====
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

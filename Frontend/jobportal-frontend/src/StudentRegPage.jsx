@@ -11,13 +11,15 @@ function StudentRegPage() {
         const data = {
             name: e.target.name.value,
             email: e.target.email.value,
-            password: e.target.password.value
+            password: e.target.password.value,
+            mobileNo: e.target.mobileNo.value,
+            workingStatus: e.target.workingStatus.value
         };
 
-        axios.post("http://localhost:8080/api/students/register", data)
+        axios.post("http://localhost:8080/api/student/auth/register", data)
             .then(() => {
-                alert("Registration successful");
-                navigate("/login");
+                alert("Student registered successfully");
+                navigate("/student/login");
             })
             .catch((err) => {
                 alert(err.response?.data || "Registration failed");
@@ -30,6 +32,7 @@ function StudentRegPage() {
                 <h3 className="text-center mb-3">Student Registration</h3>
 
                 <form onSubmit={submit}>
+
                     <div className="mb-3">
                         <label className="form-label">Full Name</label>
                         <input type="text" name="name" className="form-control" required />
@@ -43,6 +46,21 @@ function StudentRegPage() {
                     <div className="mb-3">
                         <label className="form-label">Password</label>
                         <input type="password" name="password" className="form-control" required />
+                    </div>
+
+                    <div className="mb-3">
+                        <label className="form-label">Mobile Number</label>
+                        <input type="text" name="mobileNo" className="form-control" required />
+                    </div>
+
+                    <div className="mb-3">
+                        <label className="form-label">Working Status</label>
+                        <select name="workingStatus" className="form-select" required>
+                            <option value="">Select</option>
+                            <option value="STUDENT">Student</option>
+                            <option value="FRESHER">Fresher</option>
+                            <option value="WORKING">Working Professional</option>
+                        </select>
                     </div>
 
                     <button className="btn btn-primary w-100">

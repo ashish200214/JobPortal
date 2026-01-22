@@ -1,6 +1,7 @@
 package com.jobportal.controller;
 
 import java.util.List;
+import com.jobportal.service.EmailService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -14,6 +15,8 @@ import com.jobportal.repository.ApplicationRepository;
 @RequestMapping("/api/employee/applications")
 @CrossOrigin(origins = "http://localhost:5173")
 public class EmployeeApplicationController {
+@Autowired
+private EmailService emailService;
 
     @Autowired
     private ApplicationRepository applicationRepo;
@@ -35,15 +38,23 @@ public class EmployeeApplicationController {
     // ==============================
     // UPDATE STATUS (ACCEPT / REJECT)
     // ==============================
-    @PutMapping("/{applicationId}/status")
-    public Application updateStatus(
-            @PathVariable Long applicationId,
-            @RequestParam ApplicationStatus status
-    ) {
-        Application app = applicationRepo.findById(applicationId)
-                .orElseThrow(() -> new RuntimeException("Application not found"));
+@PutMapping("/{applicationId}/status")
+public Application updateStatus(
+        @PathVariable Long applicationId,
+        @RequestParam ApplicationStatus status
+) {
+    Application app = applicationRepo.findById(applicationId)
+            .orElseThrow(() -> new RuntimeException("Application not found"));
 
-        app.setStatus(status);
-        return applicationRepo.save(app);
+    app.setStatus(status);
+    Application savedApp = applicationRepo.save(app);
+
+    // ✅ SEND MAIL ONLY IF SELECTED
+    if (status == ApplicationStatus.SELECTED) {
+        emailService.sendSelectionMail(savedApp);
     }
+
+    return savedApp;
+}
+    
 }

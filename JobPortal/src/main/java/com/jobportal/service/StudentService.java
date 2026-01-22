@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.jobportal.dto.StudentDTO;
+import com.jobportal.dto.StudentRegisterDTO;
 import com.jobportal.entity.Student;
 import com.jobportal.mapper.StudentMapper;
 import com.jobportal.repository.StudentRepo;
@@ -16,16 +16,29 @@ public class StudentService {
     private StudentRepo studentRepo;
 
     @Autowired
-    private PasswordEncoder passwordEncoder; // ✅ CORRECT
+    private PasswordEncoder passwordEncoder;
 
-    public void saveStudent(StudentDTO studentDto) {
+    // =========================
+    // REGISTER STUDENT
+    // =========================
+    public Student register(StudentRegisterDTO dto) {
 
-        Student student = StudentMapper.studentDTOToStudent(studentDto);
+        Student student = StudentMapper.toEntity(dto);
 
-        // ✅ PASSWORD ENCODING (WORKS PERMANENTLY)
-        String encodedPassword = passwordEncoder.encode(student.getPassword());
-        student.setPassword(encodedPassword);
+        // ✅ PASSWORD ENCODING
+        student.setPassword(
+                passwordEncoder.encode(student.getPassword())
+        );
 
-        studentRepo.save(student);
+        return studentRepo.save(student);
+    }
+
+    // =========================
+    // GET STUDENT BY ID
+    // =========================
+    public Student getStudentById(Long studentId) {
+
+        return studentRepo.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
     }
 }

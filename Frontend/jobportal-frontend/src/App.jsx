@@ -8,18 +8,19 @@ import HomePage from "./assets/HomePage";
 import Login from "./assets/Login";
 import StudentRegPage from "./StudentRegPage";
 import StudentHomePage from "./assets/StudentHomePage";
-import StudentDashboard from "./assets/StudentDashboard";
 import JobList from "./assets/JobList";
 import JobApply from "./assets/JobApply";
 import StudentAppliedJobs from "./assets/StudentAppliedJob";
+import ProtectedStudentRoute from "./assets/ProtectedStudentRoute";
 
 /* ===== EMPLOYEE ===== */
 import EmployeeRegister from "./assets/EmployeeRegister";
 import EmployeeLogin from "./assets/EmployeeLogin";
 import EmployeeHomePage from "./assets/EmployeeHomePage";
+import EmployeeMyJobs from "./assets/EmployeeMyJobs";
 import PostJobPage from "./assets/PostJobPage";
 import JobApplicants from "./assets/JobApplicants";
-
+import ProtectedEmployeeRoute from "./assets/ProtectedEmployeeRoute";
 
 function App() {
   return (
@@ -36,28 +37,76 @@ function App() {
         <Route path="/registration" element={<StudentRegPage />} />
 
         {/* ===== STUDENT PAGES ===== */}
-        <Route path="/student/home" element={<StudentHomePage />} />
-        <Route path="/student/dashboard" element={<StudentDashboard />} />
-        <Route path="/jobs" element={<JobList />} />
-
-        {/* ===== APPLY JOB ===== */}
-        <Route path="/jobapply/:jobId" element={<JobApply />} />
-
-        {/* ===== STUDENT APPLIED JOBS (IMPORTANT) ===== */}
         <Route
-          path="/student/applied-jobs"
-          element={<StudentAppliedJobs />}
+          path="/student/home"
+          element={
+            <ProtectedStudentRoute>
+              <StudentHomePage />
+            </ProtectedStudentRoute>
+          }
         />
 
-        {/* ===== EMPLOYEE ===== */}
+        <Route path="/jobs" element={<JobList />} />
+
+        <Route
+          path="/jobapply/:jobId"
+          element={
+            <ProtectedStudentRoute>
+              <JobApply />
+            </ProtectedStudentRoute>
+          }
+        />
+
+        <Route
+          path="/student/applied-jobs"
+          element={
+            <ProtectedStudentRoute>
+              <StudentAppliedJobs />
+            </ProtectedStudentRoute>
+          }
+        />
+
+        {/* ===== EMPLOYEE AUTH ===== */}
         <Route path="/employee/register" element={<EmployeeRegister />} />
         <Route path="/employee/login" element={<EmployeeLogin />} />
-        <Route path="/employee/home" element={<EmployeeHomePage />} />
-        <Route path="/employee/post-job" element={<PostJobPage />} />
+
+        {/* ===== EMPLOYEE PAGES ===== */}
         <Route
-  path="/employee/job/:jobId/applicants"
-  element={<JobApplicants />}
-/>
+          path="/employee/home"
+          element={
+            <ProtectedEmployeeRoute>
+              <EmployeeHomePage />
+            </ProtectedEmployeeRoute>
+          }
+        />
+
+        <Route
+          path="/employee/my-jobs"
+          element={
+            <ProtectedEmployeeRoute>
+              <EmployeeMyJobs />
+            </ProtectedEmployeeRoute>
+          }
+        />
+
+        <Route
+          path="/employee/post-job"
+          element={
+            <ProtectedEmployeeRoute>
+              <PostJobPage />
+            </ProtectedEmployeeRoute>
+          }
+        />
+
+        <Route
+          path="/employee/job/:jobId/applicants"
+          element={
+            <ProtectedEmployeeRoute>
+              <JobApplicants />
+            </ProtectedEmployeeRoute>
+          }
+        />
+
         {/* ===== FALLBACK ===== */}
         <Route
           path="*"
