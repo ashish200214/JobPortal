@@ -31,7 +31,7 @@ public class SecurityConfig {
             // ===== AUTHORIZATION =====
             .authorizeHttpRequests(auth -> auth
 
-                // 🔓 PUBLIC AUTH ENDPOINTS
+                // 🔓 PUBLIC AUTH
                 .requestMatchers(
                         "/api/auth/student/**",
                         "/api/auth/employee/**",
@@ -39,15 +39,16 @@ public class SecurityConfig {
                         "/api/employee/register/**"
                 ).permitAll()
 
-                // 🔓 PUBLIC JOB SEARCH / VIEW
+                // 🔓 PUBLIC JOB READ
                 .requestMatchers(HttpMethod.GET, "/api/job/**").permitAll()
 
-                // 🔒 EMPLOYEE ONLY
-                .requestMatchers(HttpMethod.POST, "/api/job/**").hasRole("EMPLOYEE")
-                .requestMatchers("/api/employee/**").hasRole("EMPLOYEE")
-
-                // 🔒 STUDENT ONLY
+                // 🔒 STUDENT ACTIONS
+                .requestMatchers(HttpMethod.POST, "/api/job/apply/**").hasRole("STUDENT")
                 .requestMatchers("/api/student/**").hasRole("STUDENT")
+
+                // 🔒 EMPLOYEE ACTIONS
+                .requestMatchers(HttpMethod.POST, "/api/job").hasRole("EMPLOYEE")
+                .requestMatchers("/api/employee/**").hasRole("EMPLOYEE")
 
                 // 🔓 CORS PREFLIGHT
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()

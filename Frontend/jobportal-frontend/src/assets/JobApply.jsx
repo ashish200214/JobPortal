@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../axios"; // ✅ USE INTERCEPTOR
 
 function JobApply() {
   const { jobId } = useParams();
@@ -13,46 +13,39 @@ function JobApply() {
   const [applying, setApplying] = useState(false);
 
   useEffect(() => {
-    if (!jobId || jobId === "undefined") {
+    if (!jobId) {
       alert("Invalid job");
       navigate("/jobs");
       return;
     }
 
-    const token = localStorage.getItem("token");
-    fetchData(token);
+    fetchData();
   }, [jobId]);
 
-  async function fetchData(token) {
+  async function fetchData() {
     try {
       setLoading(true);
 
-      const jobRes = await axios.get(
-        `http://localhost:8080/api/job/${jobId}`
-      );
+      // ✅ PUBLIC – NO TOKEN REQUIRED
+      const jobRes = await api.get(`/api/job/${jobId}`);
 
-      const studentRes = await axios.get(
-        "http://localhost:8080/api/student/me",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
+      // ✅ JWT REQUIRED (auto-added by interceptor)
+      const studentRes = await api.get("/api/student/me");
 
       setJob(jobRes.data);
       setStudent(studentRes.data);
 
     } catch (err) {
-      console.error("FETCH ERROR =", err.response || err);
+      console.error("FETCH ERROR =", err);
 
-      // if (err.response?.status === 401 || err.response?.status === 403) {
-      //   alert("Session expired. Please login again.");
-      //   navigate("/student/login");
-      // } else {
-      //   alert("Unable to load job details");
-      //   navigate("/jobs");
-      // }
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        alert("Session expired. Please login again.");
+        localStorage.clear();
+        navigate("/student/login");
+      } else {
+        alert("Unable to load job details");
+        navigate("/jobs");
+      }
     } finally {
       setLoading(false);
     }
@@ -64,20 +57,17 @@ function JobApply() {
       return;
     }
 
-    const token = localStorage.getItem("token");
-
     const formData = new FormData();
     formData.append("resume", resumeFile);
 
     try {
       setApplying(true);
 
-      await axios.post(
-        `http://localhost:8080/api/job/apply/${jobId}`,
+      await api.post(
+        `/api/job/apply/${jobId}`,
         formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data"
           }
         }
@@ -87,12 +77,13 @@ function JobApply() {
       navigate("/student/home");
 
     } catch (err) {
-      console.error("APPLY ERROR =", err.response || err);
+      console.error("APPLY ERROR =", err);
 
       if (err.response?.status === 400) {
         alert("⚠ You have already applied for this job");
       } else if (err.response?.status === 401 || err.response?.status === 403) {
         alert("Session expired. Please login again.");
+        localStorage.clear();
         navigate("/student/login");
       } else {
         alert("❌ Something went wrong while applying");
@@ -103,11 +94,19 @@ function JobApply() {
   }
 
   if (loading) {
-    return <div className="container mt-5 text-center">Loading job details...</div>;
+    return (
+      <div className="container mt-5 text-center">
+        Loading job details...
+      </div>
+    );
   }
 
   if (!job || !student) {
-    return <div className="container mt-5 text-center">Data not available</div>;
+    return (
+      <div className="container mt-5 text-center">
+        Data not available
+      </div>
+    );
   }
 
   return (
@@ -123,8 +122,16 @@ function JobApply() {
         <hr />
 
         <h5>Applicant Details</h5>
-        <input className="form-control mb-2" value={student.email} disabled />
-        <input className="form-control mb-2" value={student.mobileNo} disabled />
+        <input
+          className="form-control mb-2"
+          value={student.email}
+          disabled
+        />
+        <input
+          className="form-control mb-2"
+          value={student.mobileNo}
+          disabled
+        />
 
         <input
           type="file"

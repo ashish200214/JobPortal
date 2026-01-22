@@ -94,11 +94,10 @@ public ResponseEntity<?> addJob(
         Authentication authentication) {
 
     if (authentication == null) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        return ResponseEntity.status(401).body("Unauthorized");
     }
 
-    // ✅ EMAIL COMES FROM JWT (SUBJECT)
-    String email = authentication.getName();
+    String email = authentication.getName(); // ✅ EMAIL FROM JWT
 
     Employee employee = employeeService.getEmployeeByEmail(email);
 
@@ -110,8 +109,6 @@ public ResponseEntity<?> addJob(
     return ResponseEntity.ok("Job posted successfully");
 }
 
-    // 📄 STUDENT – APPLY JOB (PDF RESUME UPLOAD)
-    
    @PostMapping(
     value = "/apply/{jobId}",
     consumes = MediaType.MULTIPART_FORM_DATA_VALUE
