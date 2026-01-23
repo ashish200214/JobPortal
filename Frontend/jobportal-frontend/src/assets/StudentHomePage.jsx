@@ -40,17 +40,15 @@ function StudentHomePage() {
         <div className="col-md-4 mb-3">
           <div className="card shadow h-100">
             <div className="card-body text-center">
+              <p className="card-text">Track jobs you have applied for.</p>
+
               <button
                 className="btn btn-primary"
-                onClick={() => navigate("/applied-jobs")}
+                onClick={() => navigate("/student/applied-jobs")}
               >
                 View Applied Jobs
               </button>
 
-              <p className="card-text">Track jobs you have applied for.</p>
-              <button className="btn btn-secondary" disabled>
-                Coming Soon
-              </button>
             </div>
           </div>
         </div>

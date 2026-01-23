@@ -40,14 +40,12 @@ public class StudentAuthController {
     // =========================
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody StudentLoginDTO dto) {
-
         Student student = studentAuthService.login(dto);
 
         String token = jwtUtil.generateStudentToken(
                 student.getId(),
                 student.getEmail()
         );
-
         return ResponseEntity.ok(token);
     }
 }

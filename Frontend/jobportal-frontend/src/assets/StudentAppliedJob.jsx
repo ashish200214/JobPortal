@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../axios";
 
 function StudentAppliedJobs() {
-
+console.log("I am in StudentAppliedJobs")
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 

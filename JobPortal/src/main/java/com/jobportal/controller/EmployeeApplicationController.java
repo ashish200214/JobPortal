@@ -30,7 +30,7 @@ private EmailService emailService;
             Authentication authentication
     ) {
         // empId available if you want to add ownership validation later
-        Long empId = (Long) authentication.getPrincipal();
+        // Long empId = (Long) authentication.getPrincipal();
 
         return applicationRepo.findByJobId(jobId);
     }

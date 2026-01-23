@@ -16,14 +16,14 @@ function StudentRegPage() {
             workingStatus: e.target.workingStatus.value
         };
 
-        axios.post("http://localhost:8080/api/student/auth/register", data)
-            .then(() => {
-                alert("Student registered successfully");
-                navigate("/student/login");
-            })
-            .catch((err) => {
-                alert(err.response?.data || "Registration failed");
-            });
+            axios.post("http://localhost:8080/api/student/auth/register", data)
+                .then(() => {
+                    alert("Student registered successfully");
+                    navigate("/student/login");
+                })
+                .catch((err) => {
+                    alert(err.response?.data || "Registration failed");
+                });
     }
 
     return (

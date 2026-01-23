@@ -108,14 +108,14 @@ function App() {
         />
 
         {/* ===== FALLBACK ===== */}
-        <Route
+        {/* <Route
           path="*"
           element={
             <div className="container mt-5 text-center">
               <h3>404 - Page Not Found</h3>
             </div>
           }
-        />
+        /> */}
       </Routes>
     </>
   );

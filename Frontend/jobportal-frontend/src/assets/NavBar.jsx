@@ -34,7 +34,7 @@ function Navbar() {
                         {role === "STUDENT" && (
                             <>
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/student/dashboard">
+                                    <Link className="nav-link" to="/student/home">
                                         Dashboard
                                     </Link>
                                 </li>

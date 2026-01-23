@@ -21,15 +21,16 @@ public class StudentApplicationController {
 
     @Autowired
     private ApplicationRepository applicationRepo;
+@GetMapping
+public List<Application> myApplications(Authentication authentication) {
 
-    @GetMapping
-    public List<Application> myApplications(Authentication authentication) {
+    String email = authentication.getName();
+    System.out.println("Logged in email: " + email);
 
-        Long studentId = (Long) authentication.getPrincipal();
+    Student student = studentRepo.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("Student not found"));
 
-        Student student = studentRepo.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Student not found"));
-
-        return applicationRepo.findByStudent(student);
-    }
+    return applicationRepo.findByStudent(student);
 }
+    
+   }

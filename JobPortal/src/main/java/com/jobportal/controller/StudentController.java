@@ -2,7 +2,6 @@ package com.jobportal.controller;
 
 import com.jobportal.entity.Student;
 import com.jobportal.repository.StudentRepo;
-import com.jobportal.service.StudentService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*")
 public class StudentController {
 
-    @Autowired
-    private StudentService studentService;
+    // @Autowired
+    // private StudentService studentService;
 
     @Autowired
     private StudentRepo studentRepo; // ✅ FIX
