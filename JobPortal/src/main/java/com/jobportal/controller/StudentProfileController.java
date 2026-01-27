@@ -15,9 +15,9 @@ import com.jobportal.dto.StudentDTO;
 import com.jobportal.entity.*;
 import com.jobportal.repository.*;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/student")
-@RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:5173")
 public class StudentProfileController {
 
@@ -28,8 +28,9 @@ public class StudentProfileController {
     private final InternshipRepo internshipRepo;
     private final LanguageRepo languageRepo;
     private final AccomplishmentRepo accomplishmentRepo;
+    private final ExperienceRepo experienceRepo;
 
-    // ================= RESUME UPLOAD =================
+    // ================= RESUME UPLOAD (MULTIPART) =================
     @PostMapping("/upload-resume")
     public String uploadResume(
             @RequestParam("file") MultipartFile file,
@@ -46,6 +47,7 @@ public class StudentProfileController {
 
         Files.write(filePath, file.getBytes());
 
+        // 🔥 store path (later replace with S3 URL)
         student.setResumeUrl(filePath.toString());
         studentRepo.save(student);
 
@@ -55,8 +57,6 @@ public class StudentProfileController {
     // ================= GET PROFILE =================
     @GetMapping("/profile")
     public StudentDTO getStudentProfile(Authentication auth) {
-
-        System.out.println("AUTH USER 👉 " + auth.getName());
 
         Student student = studentRepo.findByEmail(auth.getName())
                 .orElseThrow(() -> new RuntimeException("Student not found"));
@@ -69,12 +69,18 @@ public class StudentProfileController {
         dto.setWorkingStatus(student.getWorkingStatus());
         dto.setProfileSummary(student.getProfileSummary());
 
+        // 🔥 resume URL exposed (for now)
+        dto.setResumeUrl(student.getResumeUrl());
+
         dto.setSkills(student.getSkills());
         dto.setEducationList(educationRepo.findByStudent(student));
         dto.setProjects(projectRepo.findByStudent(student));
         dto.setInternships(internshipRepo.findByStudent(student));
         dto.setLanguages(languageRepo.findByStudent(student));
         dto.setAccomplishments(accomplishmentRepo.findByStudent(student));
+
+        // 🔥 experience
+        dto.setExperiences(experienceRepo.findByStudent(student));
 
         return dto;
     }
@@ -97,94 +103,41 @@ public class StudentProfileController {
         return dto;
     }
 
-    // ================= SKILLS =================
-    @PostMapping("/add-skill")
-    public void addSkillByName(
-            @RequestParam String skillName,
-            Authentication auth) {
-
-        Student student = studentRepo.findByEmail(auth.getName())
-                .orElseThrow(() -> new RuntimeException("Student not found"));
-
-        Skill skill = skillRepo.findByNameIgnoreCase(skillName)
-                .orElseGet(() -> {
-                    Skill s = new Skill();
-                    s.setName(skillName);
-                    return skillRepo.save(s);
-                });
-
-        if (!student.getSkills().contains(skill)) {
-            student.getSkills().add(skill);
-            studentRepo.save(student);
-        }
-    }
-
-    @DeleteMapping("/remove-skill/{skillId}")
-    public void removeSkill(@PathVariable Long skillId, Authentication auth) {
-        Student student = studentRepo.findByEmail(auth.getName())
-                .orElseThrow(() -> new RuntimeException("Student not found"));
-
-        student.getSkills().removeIf(s -> s.getId().equals(skillId));
-        studentRepo.save(student);
-    }
-
-    // ================= EDUCATION =================
-    @PostMapping("/education")
-    public Education addEducation(@RequestBody Education edu, Authentication auth) {
-        Student student = studentRepo.findByEmail(auth.getName())
-                .orElseThrow(() -> new RuntimeException("Student not found"));
-
-        edu.setStudent(student);
-        return educationRepo.save(edu);
-    }
-
-    @DeleteMapping("/education/{id}")
-    public void deleteEducation(@PathVariable Long id) {
-        educationRepo.deleteById(id);
-    }
-
     // ================= PROJECT =================
     @PostMapping("/project")
     public Project addProject(@RequestBody Project project, Authentication auth) {
-        Student student = studentRepo.findByEmail(auth.getName())
-                .orElseThrow(() -> new RuntimeException("Student not found"));
-
+        Student student = studentRepo.findByEmail(auth.getName()).orElseThrow();
         project.setStudent(student);
         return projectRepo.save(project);
-    }
-
-    @DeleteMapping("/project/{id}")
-    public void deleteProject(@PathVariable Long id) {
-        projectRepo.deleteById(id);
     }
 
     // ================= INTERNSHIP =================
     @PostMapping("/internship")
     public Internship addInternship(@RequestBody Internship i, Authentication auth) {
-        Student student = studentRepo.findByEmail(auth.getName())
-                .orElseThrow(() -> new RuntimeException("Student not found"));
-
+        Student student = studentRepo.findByEmail(auth.getName()).orElseThrow();
         i.setStudent(student);
         return internshipRepo.save(i);
     }
 
-    // ================= LANGUAGE =================
-    @PostMapping("/language")
-    public Language addLanguage(@RequestBody Language l, Authentication auth) {
-        Student student = studentRepo.findByEmail(auth.getName())
-                .orElseThrow(() -> new RuntimeException("Student not found"));
-
-        l.setStudent(student);
-        return languageRepo.save(l);
-    }
-
     // ================= ACCOMPLISHMENT =================
     @PostMapping("/accomplishment")
-    public Accomplishment addAcc(@RequestBody Accomplishment a, Authentication auth) {
-        Student student = studentRepo.findByEmail(auth.getName())
-                .orElseThrow(() -> new RuntimeException("Student not found"));
+    public Accomplishment addAccomplishment(
+            @RequestBody Accomplishment a,
+            Authentication auth) {
 
+        Student student = studentRepo.findByEmail(auth.getName()).orElseThrow();
         a.setStudent(student);
         return accomplishmentRepo.save(a);
+    }
+
+    // ================= EXPERIENCE =================
+    @PostMapping("/experience")
+    public Experience addExperience(
+            @RequestBody Experience exp,
+            Authentication auth) {
+
+        Student student = studentRepo.findByEmail(auth.getName()).orElseThrow();
+        exp.setStudent(student);
+        return experienceRepo.save(exp);
     }
 }

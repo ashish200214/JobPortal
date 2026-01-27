@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../axios";
+import Experience from "../components/profile/Experience";
 
 import ProfileHeader from "../components/profile/ProfileHeader";
 import ProfileSummary from "../components/profile/ProfileSummary";
@@ -70,6 +71,12 @@ function StudentProfile() {
       <div className="card p-3 mb-4">
         <Accomplishments accomplishments={student.accomplishments || []} onUpdate={loadProfile} />
       </div>
+<div className="card p-3 mb-4">
+  <Experience
+    experiences={student.experiences || []}
+    onUpdate={loadProfile}
+  />
+</div>
 
     </div>
   );
