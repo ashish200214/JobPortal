@@ -59,9 +59,10 @@ function StudentHomePage() {
             <div className="card-body text-center">
               <h5 className="card-title">My Profile</h5>
               <p className="card-text">View or update your profile details.</p>
-              <button className="btn btn-secondary" disabled>
-                Coming Soon
-              </button>
+               <button
+      className="btn btn-primary"
+      onClick={() => navigate("/student/profile")}
+    >View Profile</button>
             </div>
           </div>
         </div>

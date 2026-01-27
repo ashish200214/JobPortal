@@ -12,7 +12,7 @@ import com.jobportal.repository.ApplicationRepository;
 import com.jobportal.repository.StudentRepo;
 
 @RestController
-@RequestMapping("/api/student/applications")
+@RequestMapping("/api/student")
 @CrossOrigin(origins = "http://localhost:5173")
 public class StudentApplicationController {
 
@@ -21,16 +21,18 @@ public class StudentApplicationController {
 
     @Autowired
     private ApplicationRepository applicationRepo;
-@GetMapping
-public List<Application> myApplications(Authentication authentication) {
 
-    String email = authentication.getName();
-    System.out.println("Logged in email: " + email);
+    // GET: /api/student/applications
+    @GetMapping("/applications")
+    public List<Application> myApplications(Authentication authentication) {
 
-    Student student = studentRepo.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("Student not found"));
+        // 🔐 comes from JWT subject (email)
+        String email = authentication.getName();
+        System.out.println("Logged in student email: " + email);
 
-    return applicationRepo.findByStudent(student);
+        Student student = studentRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Student not found with email: " + email));
+
+        return applicationRepo.findByStudent(student);
+    }
 }
-    
-   }

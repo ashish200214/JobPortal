@@ -27,75 +27,56 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            // ===== BASIC CONFIG =====
             .cors(cors -> {})
             .csrf(csrf -> csrf.disable())
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable())
 
-            // ===== AUTHORIZATION =====
             .authorizeHttpRequests(auth -> auth
 
-                // 🔓 PUBLIC AUTH
+                // ===== PUBLIC =====
                 .requestMatchers(
                         "/api/auth/student/**",
                         "/api/auth/employee/**",
                         "/api/student/auth/**",
-                        "/api/employee/register/**"
+                        "/api/job/search/**"
                 ).permitAll()
 
-                // 🔓 PUBLIC JOB READ
                 .requestMatchers(HttpMethod.GET, "/api/job/**").permitAll()
 
-                // 🔒 STUDENT ACTIONS
-                .requestMatchers(HttpMethod.POST, "/api/job/apply/**").hasRole("STUDENT")
+                // ===== STUDENT (ALL METHODS) =====
                 .requestMatchers("/api/student/**").hasRole("STUDENT")
 
-                // 🔒 EMPLOYEE ACTIONS
+                // ===== EMPLOYEE =====
                 .requestMatchers(HttpMethod.POST, "/api/job").hasRole("EMPLOYEE")
                 .requestMatchers("/api/employee/**").hasRole("EMPLOYEE")
 
-                // 🔓 CORS PREFLIGHT
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                // 🔒 EVERYTHING ELSE
                 .anyRequest().authenticated()
             )
 
-            // ===== JWT FILTER =====
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // ===== PASSWORD ENCODER =====
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-@Bean
-public CorsConfigurationSource corsConfigurationSource() {
-    CorsConfiguration config = new CorsConfiguration();
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
 
-    config.setAllowedOrigins(List.of("http://localhost:5173"));
-    config.setAllowedMethods(List.of(
-            "GET", "POST", "PUT", "DELETE", "OPTIONS"
-    ));
+        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+        config.setAllowCredentials(true);
 
-    // 🔥 THIS IS THE KEY
-    config.setAllowedHeaders(List.of(
-            "Authorization",
-            "Content-Type",
-            "Accept"
-    ));
-
-    config.setExposedHeaders(List.of("Authorization"));
-    config.setAllowCredentials(false);
-
-    UrlBasedCorsConfigurationSource source =
-            new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", config);
-    return source;
-}
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
 }

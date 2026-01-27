@@ -4,11 +4,10 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
-
-import org.springframework.stereotype.Component;
 
 @Component
 public class JwtUtil {
@@ -18,13 +17,11 @@ public class JwtUtil {
 
     private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
 
-    private static final long EXPIRATION_TIME = 60 * 60 * 1000; // 1 hour
+    private static final long EXPIRATION_TIME = 60 * 60 * 1000;
 
-    // ================= STUDENT TOKEN =================
     public String generateStudentToken(Long studentId, String email) {
-
         return Jwts.builder()
-                .setSubject(email) // 🔥 REQUIRED (used in /me)
+                .setSubject(email)
                 .claim("studentId", studentId)
                 .claim("role", "STUDENT")
                 .setIssuedAt(new Date())
@@ -33,9 +30,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    // ================= EMPLOYEE TOKEN =================
     public String generateEmployeeToken(Long empId, String email) {
-
         return Jwts.builder()
                 .setSubject(email)
                 .claim("empId", empId)
@@ -46,10 +41,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    // ================= COMMON =================
-    // 🔥 MUST BE PUBLIC
     public Claims extractAllClaims(String token) {
-
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
@@ -69,13 +61,5 @@ public class JwtUtil {
 
     public String extractRole(String token) {
         return extractAllClaims(token).get("role", String.class);
-    }
-
-    public Long extractStudentId(String token) {
-        return extractAllClaims(token).get("studentId", Long.class);
-    }
-
-    public Long extractEmpId(String token) {
-        return extractAllClaims(token).get("empId", Long.class);
     }
 }

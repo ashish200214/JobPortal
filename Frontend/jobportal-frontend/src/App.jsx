@@ -21,7 +21,7 @@ import EmployeeMyJobs from "./assets/EmployeeMyJobs";
 import PostJobPage from "./assets/PostJobPage";
 import JobApplicants from "./assets/JobApplicants";
 import ProtectedEmployeeRoute from "./assets/ProtectedEmployeeRoute";
-
+import StudentProfile from "./assets/StudentProfile";
 function App() {
   return (
     <>
@@ -65,6 +65,9 @@ function App() {
             </ProtectedStudentRoute>
           }
         />
+
+        <Route path="/student/profile" element={<StudentProfile />} />
+
 
         {/* ===== EMPLOYEE AUTH ===== */}
         <Route path="/employee/register" element={<EmployeeRegister />} />

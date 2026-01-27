@@ -2,14 +2,18 @@ import { useEffect, useState } from "react";
 import api from "../axios";
 
 function StudentAppliedJobs() {
-console.log("I am in StudentAppliedJobs")
+
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     api.get("/api/student/applications")
-      .then(res => setApplications(res.data))
-      .catch(err => console.error(err))
+      .then(res => {
+        setApplications(res.data);
+      })
+      .catch(err => {
+        console.error("Applied jobs error:", err);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -18,10 +22,15 @@ console.log("I am in StudentAppliedJobs")
   return (
     <div className="container mt-4">
       <h3>My Applied Jobs</h3>
+
+      {applications.length === 0 && (
+        <p>No jobs applied yet.</p>
+      )}
+
       {applications.map(app => (
         <div key={app.id} className="card p-3 mb-3">
-          <h5>{app.job.jobRole}</h5>
-          <p>{app.job.companyName}</p>
+          <h5>{app.job?.jobRole}</h5>
+          <p>{app.job?.companyName}</p>
           <p>Status: <b>{app.status}</b></p>
         </div>
       ))}
@@ -30,3 +39,4 @@ console.log("I am in StudentAppliedJobs")
 }
 
 export default StudentAppliedJobs;
+  

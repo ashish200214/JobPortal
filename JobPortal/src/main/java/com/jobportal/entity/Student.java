@@ -2,6 +2,7 @@ package com.jobportal.entity;
 
 import java.util.List;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,4 +33,10 @@ private String workingStatus;
     inverseJoinColumns = @JoinColumn(name="skill_id") 
 )
 private List<Skill> skills;
+@Column(length = 1000)
+private String profileSummary;
+
+private String resumeUrl; // resume file path
+
+
 }
