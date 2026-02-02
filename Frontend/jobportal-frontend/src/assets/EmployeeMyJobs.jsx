@@ -39,6 +39,16 @@ function EmployeeMyJobs() {
             <p>{job.description}</p>
             <p><b>City:</b> {job.city}</p>
             <p><b>Salary:</b> ₹{job.salary}</p>
+
+            {/* ✅ NEW BUTTON */}
+            <button
+              className="btn btn-outline-primary mt-2"
+              onClick={() =>
+                navigate(`/employee/job/${job.id}/applicants`)
+              }
+            >
+              View Applicants
+            </button>
           </div>
         ))
       )}
