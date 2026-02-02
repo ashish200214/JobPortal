@@ -12,7 +12,7 @@ function Login() {
       password: e.target.password.value,
     };
 
-    // 🔥 CLEAR OLD LOGIN (EMPLOYEE → STUDENT SWITCH SAFE)
+    // 🔥 CLEAR OLD SESSION (SAFE SWITCH)
     localStorage.clear();
 
     axios
@@ -25,44 +25,68 @@ function Login() {
           return;
         }
 
-        // ✅ REQUIRED FOR SECURITY + ROUTING
+        // ✅ REQUIRED FOR YOUR APP
         localStorage.setItem("token", token);
         localStorage.setItem("role", "STUDENT");
 
-        alert("Login successful");
         navigate("/student/home");
       })
       .catch((err) => {
-        alert(err.response?.data || "Login failed");
+        alert(err.response?.data || "Invalid email or password");
       });
   }
 
   return (
     <div className="container d-flex justify-content-center align-items-center vh-100">
       <div
-        className="card shadow-lg p-4 rounded-4"
-        style={{ maxWidth: "450px", width: "100%" }}
+        className="card shadow-lg border-0 rounded-4 p-4"
+        style={{ maxWidth: "420px", width: "100%" }}
       >
-        <h3 className="text-center mb-3">Student Login</h3>
+        <h3 className="text-center mb-1">Student Login</h3>
+        <p className="text-center text-muted mb-4">
+          Sign in to apply for jobs
+        </p>
 
         <form onSubmit={submit}>
           <div className="mb-3">
-            <label className="form-label">Email</label>
-            <input type="email" name="email" className="form-control" required />
-          </div>
-
-          <div className="mb-3">
-            <label className="form-label">Password</label>
+            <label className="form-label fw-semibold">Email</label>
             <input
-              type="password"
-              name="password"
+              type="email"
+              name="email"
               className="form-control"
+              placeholder="student@email.com"
               required
             />
           </div>
 
-          <button className="btn btn-success w-100">Login</button>
+          <div className="mb-4">
+            <label className="form-label fw-semibold">Password</label>
+            <input
+              type="password"
+              name="password"
+              className="form-control"
+              placeholder="Enter password"
+              required
+            />
+          </div>
+
+          <button className="btn btn-success w-100 py-2 fw-semibold">
+            Login
+          </button>
         </form>
+
+        <hr className="my-4" />
+
+        <p className="text-center mb-0">
+          Are you an employer?{" "}
+          <span
+            className="text-primary fw-semibold"
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate("/employee/login")}
+          >
+            Login here
+          </span>
+        </p>
       </div>
     </div>
   );

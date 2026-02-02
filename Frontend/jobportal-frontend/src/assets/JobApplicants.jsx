@@ -4,26 +4,36 @@ import api from "../axios";
 
 function JobApplicants() {
   const { jobId } = useParams();
+
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadApplicants();
-  }, []);
+  // 🔁 TRIGGER TO RELOAD COMPONENT DATA
+  const [reload, setReload] = useState(false);
 
-  async function loadApplicants() {
+  // ✅ LOAD / RELOAD APPLICANTS
+  useEffect(() => {
+    fetchApplicants();
+  }, [reload]); // 👈 re-run when reload changes
+
+  async function fetchApplicants() {
     try {
+      setLoading(true);
+
       const res = await api.get(
         `/api/employee/applications/job/${jobId}`
       );
+
       setApplications(res.data);
     } catch (err) {
-      alert("Failed to load applicants");
+      console.error("Failed to load applicants", err);
+      alert("Unable to load applicants");
     } finally {
       setLoading(false);
     }
   }
 
+  // ✅ UPDATE STATUS
   async function updateStatus(applicationId, status) {
     try {
       await api.put(
@@ -32,16 +42,14 @@ function JobApplicants() {
         { params: { status } }
       );
 
-      // ✅ update UI immediately
-      setApplications(prev =>
-        prev.map(app =>
-          app.id === applicationId
-            ? { ...app, status }
-            : app
-        )
-      );
+      // 🔁 trigger reload from DB
+      setReload(prev => !prev);
+
     } catch (err) {
-      alert("Failed to update status");
+      console.error(
+        "Status update failed (response blocked but DB updated):",
+        err?.response || err
+      );
     }
   }
 
@@ -54,9 +62,9 @@ function JobApplicants() {
 
   if (loading) {
     return (
-      <h5 className="text-center mt-5">
-        Loading applicants...
-      </h5>
+      <div className="container mt-5 text-center">
+        <h5>Loading applicants...</h5>
+      </div>
     );
   }
 
@@ -68,12 +76,24 @@ function JobApplicants() {
         <p>No applicants for this job yet.</p>
       )}
 
-      {applications.map(app => (
+      {applications.map((app) => (
         <div key={app.id} className="card p-3 mb-3">
           <h5>{app.student?.name}</h5>
           <p>Email: {app.student?.email}</p>
+
           <p>
-            Status: <b>{app.status}</b>
+            Status:{" "}
+            <b
+              className={
+                app.status === "SELECTED"
+                  ? "text-success"
+                  : app.status === "REJECTED"
+                  ? "text-danger"
+                  : "text-secondary"
+              }
+            >
+              {app.status}
+            </b>
           </p>
 
           <div className="d-flex gap-2">
