@@ -98,4 +98,47 @@ public class ApplicationController {
 
         return ResponseEntity.ok("Job applied successfully");
     }
+    @PostMapping("/apply-one-click/{jobId}")
+public ResponseEntity<?> applyOneClick(
+        @PathVariable Long jobId,
+        Authentication authentication
+) {
+
+    if (authentication == null || authentication.getName() == null) {
+        return ResponseEntity.status(403).body("Unauthorized");
+    }
+
+    String email = authentication.getName();
+
+    Student student = studentRepo.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("Student not found"));
+
+    Job job = jobRepo.findById(jobId)
+            .orElseThrow(() -> new RuntimeException("Job not found"));
+
+    // 🚫 Prevent duplicate apply
+    if (applicationRepo.existsByStudentAndJob(student, job)) {
+        return ResponseEntity.badRequest().body("Already applied");
+    }
+
+    // ❗ Resume must be uploaded earlier
+    if (student.getResumeUrl() == null || student.getResumeUrl().isBlank()) {
+        return ResponseEntity.badRequest()
+                .body("Upload resume in profile before applying");
+    }
+
+    // ✅ Create application
+    Application application = new Application();
+    application.setStudent(student);
+    application.setJob(job);
+
+    // 🔥 IMPORTANT: reuse existing resume
+    application.setResumePath(student.getResumeUrl());
+    application.setResumeFileName("PROFILE_RESUME");
+
+    applicationRepo.save(application);
+
+    return ResponseEntity.ok("Job applied successfully");
+}
+
 }

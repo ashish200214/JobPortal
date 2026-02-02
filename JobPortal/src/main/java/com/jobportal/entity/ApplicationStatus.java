@@ -2,6 +2,8 @@ package com.jobportal.entity;
 
 public enum ApplicationStatus {
     APPLIED,
-    SELECTED,
-    REJECTED
+    SHORTLISTED,
+    REJECTED,
+    SELECTED
 }
+

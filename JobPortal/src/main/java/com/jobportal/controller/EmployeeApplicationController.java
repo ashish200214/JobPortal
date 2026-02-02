@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.jobportal.entity.Application;
 import com.jobportal.entity.ApplicationStatus;
+import com.jobportal.entity.Notification;
 import com.jobportal.repository.ApplicationRepository;
+import com.jobportal.repository.NotificationRepository;
 
 @RestController
 @RequestMapping("/api/employee/applications")
@@ -17,6 +19,8 @@ import com.jobportal.repository.ApplicationRepository;
 public class EmployeeApplicationController {
 @Autowired
 private EmailService emailService;
+@Autowired
+private NotificationRepository notificationRepo;
 
     @Autowired
     private ApplicationRepository applicationRepo;
@@ -36,9 +40,9 @@ private EmailService emailService;
     }
 
     // ==============================
-    // UPDATE STATUS (ACCEPT / REJECT)
-    // ==============================
-@PutMapping("/{applicationId}/status")
+    //   STATUS (ACCEPT / REJECT)
+    
+    @PutMapping("/{applicationId}/status")
 public Application updateStatus(
         @PathVariable Long applicationId,
         @RequestParam ApplicationStatus status
@@ -49,12 +53,22 @@ public Application updateStatus(
     app.setStatus(status);
     Application savedApp = applicationRepo.save(app);
 
-    // ✅ SEND MAIL ONLY IF SELECTED
+    // 🔔 CREATE NOTIFICATION FOR STUDENT
+    Notification notification = new Notification();
+    notification.setStudent(savedApp.getStudent());
+    notification.setMessage(
+            "Your application for " +
+            savedApp.getJob().getJobRole() +
+            " is now " + status
+    );
+    notificationRepo.save(notification);
+
+    // ✅ SEND MAIL ONLY IF SELECTED (YOUR EXISTING LOGIC)
     if (status == ApplicationStatus.SELECTED) {
         emailService.sendSelectionMail(savedApp);
     }
 
     return savedApp;
 }
-    
+
 }
