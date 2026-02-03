@@ -6,12 +6,14 @@ function JobList() {
   const navigate = useNavigate();
 
   const [jobs, setJobs] = useState([]);
+  const [filteredJobs, setFilteredJobs] = useState([]);
   const [appliedJobIds, setAppliedJobIds] = useState([]);
 
   const [keyword, setKeyword] = useState("");
   const [location, setLocation] = useState("");
   const [industry, setIndustry] = useState("");
   const [salary, setSalary] = useState("");
+  const [category, setCategory] = useState(""); // ✅ NEW
 
   const formatCategory = (category) => {
     if (!category) return "";
@@ -21,6 +23,9 @@ function JobList() {
       .replace(/\b\w/g, c => c.toUpperCase());
   };
 
+  // ===============================
+  // FETCH JOBS
+  // ===============================
   const fetchJobs = async () => {
     try {
       const params = {};
@@ -36,6 +41,22 @@ function JobList() {
     }
   };
 
+  // ===============================
+  // FILTER BY CATEGORY (CLIENT SIDE)
+  // ===============================
+  useEffect(() => {
+    if (!category) {
+      setFilteredJobs(jobs);
+    } else {
+      setFilteredJobs(
+        jobs.filter(job => job.category === category)
+      );
+    }
+  }, [jobs, category]);
+
+  // ===============================
+  // FETCH APPLIED JOBS
+  // ===============================
   const fetchAppliedJobs = async () => {
     try {
       const res = await api.get("/api/student/applied-jobs");
@@ -67,16 +88,53 @@ function JobList() {
 
       {/* FILTERS */}
       <div className="row mb-3">
-        <input className="col m-1" placeholder="Keyword" value={keyword} onChange={e => setKeyword(e.target.value)} />
-        <input className="col m-1" placeholder="Location" value={location} onChange={e => setLocation(e.target.value)} />
-        <input className="col m-1" placeholder="Industry" value={industry} onChange={e => setIndustry(e.target.value)} />
-        <input className="col m-1" type="number" placeholder="Salary" value={salary} onChange={e => setSalary(e.target.value)} />
+        <input
+          className="col m-1"
+          placeholder="Keyword"
+          value={keyword}
+          onChange={e => setKeyword(e.target.value)}
+        />
+
+        <input
+          className="col m-1"
+          placeholder="Location"
+          value={location}
+          onChange={e => setLocation(e.target.value)}
+        />
+
+        <input
+          className="col m-1"
+          placeholder="Industry"
+          value={industry}
+          onChange={e => setIndustry(e.target.value)}
+        />
+
+        <input
+          className="col m-1"
+          type="number"
+          placeholder="Salary"
+          value={salary}
+          onChange={e => setSalary(e.target.value)}
+        />
+
+        {/* ✅ CATEGORY FILTER */}
+        <select
+          className="col m-1"
+          value={category}
+          onChange={e => setCategory(e.target.value)}
+        >
+          <option value="">All Categories</option>
+          <option value="INTERNSHIP">Internship</option>
+          <option value="PART_TIME">Part-time</option>
+          <option value="FULL_TIME">Full-time</option>
+          <option value="FREELANCE">Freelance</option>
+        </select>
       </div>
 
-      {jobs.length === 0 && <p>No jobs found</p>}
+      {filteredJobs.length === 0 && <p>No jobs found</p>}
 
       <div className="row">
-        {jobs.map(job => {
+        {filteredJobs.map(job => {
           const isApplied = appliedJobIds.includes(job.id);
 
           return (
@@ -92,7 +150,6 @@ function JobList() {
                 </div>
 
                 <p>{job.description}</p>
-
                 <p><b>City:</b> {job.city}</p>
                 <p><b>Salary:</b> ₹{job.salary}</p>
 
