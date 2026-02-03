@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
 @Entity
 @Data
 public class Notification {
@@ -15,10 +14,11 @@ public class Notification {
 
     private String message;
 
-    private boolean read = false;
+    @Column(name = "is_read", nullable = false)
+    private boolean read;
 
     @ManyToOne
     private Student student;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 }
