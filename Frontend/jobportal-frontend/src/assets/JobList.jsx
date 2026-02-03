@@ -13,14 +13,36 @@ function JobList() {
   const [location, setLocation] = useState("");
   const [industry, setIndustry] = useState("");
   const [salary, setSalary] = useState("");
-  const [category, setCategory] = useState(""); // ✅ NEW
+  const [category, setCategory] = useState("");
 
+  // ===============================
+  // HELPERS
+  // ===============================
   const formatCategory = (category) => {
     if (!category) return "";
     return category
       .replace("_", " ")
       .toLowerCase()
       .replace(/\b\w/g, c => c.toUpperCase());
+  };
+
+  const getExpiryInfo = (job) => {
+    if (!job.expiryDate) return null;
+
+    const today = new Date();
+    const expiry = new Date(job.expiryDate);
+    const diffTime = expiry - today;
+    const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (daysLeft < 0 || job.expired) {
+      return { label: "Expired", className: "bg-danger" };
+    }
+
+    if (daysLeft <= 3) {
+      return { label: `Expires in ${daysLeft} day(s)`, className: "bg-warning text-dark" };
+    }
+
+    return { label: `Expires in ${daysLeft} days`, className: "bg-success" };
   };
 
   // ===============================
@@ -42,15 +64,13 @@ function JobList() {
   };
 
   // ===============================
-  // FILTER BY CATEGORY (CLIENT SIDE)
+  // FILTER BY CATEGORY
   // ===============================
   useEffect(() => {
     if (!category) {
       setFilteredJobs(jobs);
     } else {
-      setFilteredJobs(
-        jobs.filter(job => job.category === category)
-      );
+      setFilteredJobs(jobs.filter(job => job.category === category));
     }
   }, [jobs, category]);
 
@@ -72,6 +92,9 @@ function JobList() {
     fetchAppliedJobs();
   }, []);
 
+  // ===============================
+  // APPLY
+  // ===============================
   const applyForJob = async (jobId) => {
     try {
       const res = await api.post(`/api/student/apply-one-click/${jobId}`);
@@ -88,41 +111,12 @@ function JobList() {
 
       {/* FILTERS */}
       <div className="row mb-3">
-        <input
-          className="col m-1"
-          placeholder="Keyword"
-          value={keyword}
-          onChange={e => setKeyword(e.target.value)}
-        />
+        <input className="col m-1" placeholder="Keyword" value={keyword} onChange={e => setKeyword(e.target.value)} />
+        <input className="col m-1" placeholder="Location" value={location} onChange={e => setLocation(e.target.value)} />
+        <input className="col m-1" placeholder="Industry" value={industry} onChange={e => setIndustry(e.target.value)} />
+        <input className="col m-1" type="number" placeholder="Salary" value={salary} onChange={e => setSalary(e.target.value)} />
 
-        <input
-          className="col m-1"
-          placeholder="Location"
-          value={location}
-          onChange={e => setLocation(e.target.value)}
-        />
-
-        <input
-          className="col m-1"
-          placeholder="Industry"
-          value={industry}
-          onChange={e => setIndustry(e.target.value)}
-        />
-
-        <input
-          className="col m-1"
-          type="number"
-          placeholder="Salary"
-          value={salary}
-          onChange={e => setSalary(e.target.value)}
-        />
-
-        {/* ✅ CATEGORY FILTER */}
-        <select
-          className="col m-1"
-          value={category}
-          onChange={e => setCategory(e.target.value)}
-        >
+        <select className="col m-1" value={category} onChange={e => setCategory(e.target.value)}>
           <option value="">All Categories</option>
           <option value="INTERNSHIP">Internship</option>
           <option value="PART_TIME">Part-time</option>
@@ -136,6 +130,8 @@ function JobList() {
       <div className="row">
         {filteredJobs.map(job => {
           const isApplied = appliedJobIds.includes(job.id);
+          const expiryInfo = getExpiryInfo(job);
+          const isExpired = expiryInfo?.label === "Expired";
 
           return (
             <div className="col-md-4 mb-3" key={job.id}>
@@ -153,12 +149,25 @@ function JobList() {
                 <p><b>City:</b> {job.city}</p>
                 <p><b>Salary:</b> ₹{job.salary}</p>
 
+                {/* ✅ EXPIRY BADGE */}
+                {expiryInfo && (
+                  <span className={`badge mb-2 ${expiryInfo.className}`}>
+                    {expiryInfo.label}
+                  </span>
+                )}
+
                 <button
-                  className={`btn ${isApplied ? "btn-secondary" : "btn-primary"}`}
-                  disabled={isApplied}
+                  className={`btn ${
+                    isExpired || isApplied ? "btn-secondary" : "btn-primary"
+                  }`}
+                  disabled={isExpired || isApplied}
                   onClick={() => applyForJob(job.id)}
                 >
-                  {isApplied ? "Applied ✔" : "Apply"}
+                  {isExpired
+                    ? "Expired"
+                    : isApplied
+                    ? "Applied ✔"
+                    : "Apply"}
                 </button>
               </div>
             </div>

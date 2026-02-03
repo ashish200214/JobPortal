@@ -4,6 +4,10 @@ import org.springframework.data.jpa.domain.Specification;
 import com.jobportal.entity.Job;
 
 public class JobSpecification {
+public static Specification<Job> notExpired() {
+    return (root, query, cb) ->
+            cb.isFalse(root.get("expired"));
+}
 
     public static Specification<Job> keywordLike(String keyword) {
         return (root, query, cb) -> {

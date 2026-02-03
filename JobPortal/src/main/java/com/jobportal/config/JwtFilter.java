@@ -36,14 +36,16 @@ public class JwtFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
+    System.out.println("➡️ REQUEST PATH = " + path);
 
+    String header = request.getHeader("Authorization");
+    System.out.println("➡️ AUTH HEADER = " + header);
         if (HttpMethod.OPTIONS.matches(request.getMethod())
                 || PUBLIC_URLS.stream().anyMatch(path::startsWith)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String header = request.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")) {
             SecurityContextHolder.clearContext();

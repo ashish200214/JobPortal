@@ -1,13 +1,14 @@
 package com.jobportal.dto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.jobportal.entity.JobCategory;
-
 import lombok.Data;
 
 @Data
 public class JobDTO {
+
     private Long id;
     private String jobRole;
     private String description;
@@ -17,8 +18,13 @@ public class JobDTO {
     private String mobileNo;
     private String city;
 
-    private List<String> skills;
     private JobCategory category;
+    private List<String> skills;
 
+    // ✅ EXPIRY INFO
+    private LocalDate expiryDate;
+    private boolean expired;
+
+    // ✅ ONLY FOR POST JOB
+    private Integer expiryDays;
 }
-

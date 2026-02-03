@@ -13,8 +13,11 @@ function PostJobPage() {
   const [mobileNo, setMobileNo] = useState("");
   const [city, setCity] = useState("");
 
-  // ✅ JOB CATEGORY
+  // ✅ CATEGORY
   const [category, setCategory] = useState("");
+
+  // ✅ EXPIRY DAYS
+  const [expiryDays, setExpiryDays] = useState("");
 
   // ✅ SKILLS
   const [skillInput, setSkillInput] = useState("");
@@ -42,13 +45,14 @@ function PostJobPage() {
       await api.post("/api/job", {
         jobRole,
         description,
+        skills,
         salary,
         openings,
         companyName,
         mobileNo,
         city,
-        category, // ✅ NEW FIELD
-        skills,
+        category,              // ✅ CATEGORY SENT
+        expiryDays: expiryDays || null // ✅ OPTIONAL
       });
 
       alert("Job posted successfully");
@@ -77,24 +81,15 @@ function PostJobPage() {
           className="form-control mb-2"
           placeholder="Job Role"
           value={jobRole}
-          onChange={(e) => setJobRole(e.target.value)}
+          onChange={e => setJobRole(e.target.value)}
           required
         />
 
-        {/* DESCRIPTION */}
-        <textarea
-          className="form-control mb-3"
-          placeholder="Job Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-        />
-
-        {/* JOB CATEGORY */}
+        {/* CATEGORY */}
         <select
-          className="form-control mb-3"
+          className="form-control mb-2"
           value={category}
-          onChange={(e) => setCategory(e.target.value)}
+          onChange={e => setCategory(e.target.value)}
           required
         >
           <option value="">Select Job Category</option>
@@ -104,6 +99,15 @@ function PostJobPage() {
           <option value="FREELANCE">Freelance</option>
         </select>
 
+        {/* DESCRIPTION */}
+        <textarea
+          className="form-control mb-3"
+          placeholder="Job Description"
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+          required
+        />
+
         {/* SKILLS */}
         <label className="form-label fw-semibold">Skills</label>
         <div className="d-flex mb-2">
@@ -111,7 +115,7 @@ function PostJobPage() {
             className="form-control"
             placeholder="Add skill (e.g. Java)"
             value={skillInput}
-            onChange={(e) => setSkillInput(e.target.value)}
+            onChange={e => setSkillInput(e.target.value)}
           />
           <button
             type="button"
@@ -141,7 +145,7 @@ function PostJobPage() {
           className="form-control mb-2"
           placeholder="Salary"
           value={salary}
-          onChange={(e) => setSalary(e.target.value)}
+          onChange={e => setSalary(e.target.value)}
           required
         />
 
@@ -151,8 +155,18 @@ function PostJobPage() {
           className="form-control mb-2"
           placeholder="Openings"
           value={openings}
-          onChange={(e) => setOpenings(e.target.value)}
+          onChange={e => setOpenings(e.target.value)}
           required
+        />
+
+        {/* EXPIRY DAYS */}
+        <input
+          type="number"
+          className="form-control mb-2"
+          placeholder="Job expires in (days) — default 30"
+          value={expiryDays}
+          onChange={e => setExpiryDays(e.target.value)}
+          min="1"
         />
 
         {/* COMPANY */}
@@ -160,7 +174,7 @@ function PostJobPage() {
           className="form-control mb-2"
           placeholder="Company Name"
           value={companyName}
-          onChange={(e) => setCompanyName(e.target.value)}
+          onChange={e => setCompanyName(e.target.value)}
           required
         />
 
@@ -169,7 +183,7 @@ function PostJobPage() {
           className="form-control mb-2"
           placeholder="Mobile Number"
           value={mobileNo}
-          onChange={(e) => setMobileNo(e.target.value)}
+          onChange={e => setMobileNo(e.target.value)}
           required
         />
 
@@ -178,13 +192,14 @@ function PostJobPage() {
           className="form-control mb-3"
           placeholder="City"
           value={city}
-          onChange={(e) => setCity(e.target.value)}
+          onChange={e => setCity(e.target.value)}
           required
         />
 
         <button className="btn btn-primary w-100">
           Post Job
         </button>
+
       </form>
     </div>
   );

@@ -39,19 +39,28 @@ public class SecurityConfig {
                         "/api/auth/student/**",
                         "/api/auth/employee/**",
                         "/api/student/auth/**",
-                        "/api/job/search/**"
+                        "/api/job/search/**",
+                        "/api/job/all",
+                        "/api/job/{id}"
                 ).permitAll()
 
-                .requestMatchers(HttpMethod.GET, "/api/job/**").permitAll()
-
-                // ===== STUDENT (ALL METHODS) =====
-                .requestMatchers("/api/student/**").hasRole("STUDENT")
+                // ===== STUDENT =====
+                .requestMatchers("/api/student/**")
+                .hasAuthority("ROLE_STUDENT")
 
                 // ===== EMPLOYEE =====
-                .requestMatchers(HttpMethod.POST, "/api/job").hasRole("EMPLOYEE")
-                .requestMatchers("/api/employee/**").hasRole("EMPLOYEE")
+                .requestMatchers(HttpMethod.POST, "/api/job")
+                .hasAuthority("ROLE_EMPLOYEE")
 
+                .requestMatchers(HttpMethod.GET, "/api/job/my-jobs")
+                .hasAuthority("ROLE_EMPLOYEE")
+
+                .requestMatchers("/api/employee/**")
+                .hasAuthority("ROLE_EMPLOYEE")
+
+                // ===== OPTIONS =====
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                 .anyRequest().authenticated()
             )
 

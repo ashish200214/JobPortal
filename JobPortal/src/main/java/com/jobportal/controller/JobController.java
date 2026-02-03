@@ -196,5 +196,20 @@ public ResponseEntity<JobDTO> getJobById(@PathVariable Long id) {
     Job job = jobService.getJobById(id);
     return ResponseEntity.ok(JobMapper.jobToJobDTO(job));
 }
+@PutMapping("/renew/{jobId}")
+public ResponseEntity<?> renewJob(
+        @PathVariable Long jobId,
+        @RequestParam int days
+) {
+
+    Job job = jobService.getJobById(jobId);
+
+    job.setExpiryDate(job.getExpiryDate().plusDays(days));
+    job.setExpired(false);
+
+    jobService.save(job);
+
+    return ResponseEntity.ok("Job renewed successfully");
+}
 
 }

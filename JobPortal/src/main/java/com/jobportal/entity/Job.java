@@ -1,9 +1,9 @@
 package com.jobportal.entity;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -18,24 +18,30 @@ public class Job {
     private String jobRole;
     private String description;
     private Double salary;
-    private Integer openings; // ✅ NUMBER OF VACANCIES
+    private Integer openings;
     private String companyName;
     private String mobileNo;
     private String city;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private JobCategory category;
+
+    // ✅ EXPIRY
+    private LocalDate expiryDate;
+
+    private boolean expired;
+
     @ManyToMany
     @JoinTable(
-    name = "job_skills",
-    joinColumns = @JoinColumn(name = "job_id"),
-    inverseJoinColumns = @JoinColumn(name = "skill_id")
-)
+        name = "job_skills",
+        joinColumns = @JoinColumn(name = "job_id"),
+        inverseJoinColumns = @JoinColumn(name = "skill_id")
+    )
     private List<Skill> skills;
 
     @ManyToOne
     @JoinColumn(name = "employee_id")
     @JsonIgnore
     private Employee employee;
-    @Enumerated(EnumType.STRING)
-@Column(nullable = false)
-private JobCategory category;
 }
