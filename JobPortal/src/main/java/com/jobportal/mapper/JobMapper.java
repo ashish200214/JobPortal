@@ -27,6 +27,8 @@ public class JobMapper {
         job.setCompanyName(dto.getCompanyName());
         job.setMobileNo(dto.getMobileNo());
         job.setCity(dto.getCity());
+        job.setCategory(dto.getCategory());
+
 
         // 🔥 Convert skill names → Skill entities
         if (dto.getSkills() != null && !dto.getSkills().isEmpty()) {
@@ -68,6 +70,7 @@ public class JobMapper {
         dto.setCompanyName(job.getCompanyName());
         dto.setMobileNo(job.getMobileNo());
         dto.setCity(job.getCity());
+dto.setCategory(job.getCategory());
 
         // 🔁 Convert Skill entities → skill names
         if (job.getSkills() != null && !job.getSkills().isEmpty()) {

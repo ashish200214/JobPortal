@@ -35,4 +35,7 @@ public class Job {
     @JoinColumn(name = "employee_id")
     @JsonIgnore
     private Employee employee;
+    @Enumerated(EnumType.STRING)
+@Column(nullable = false)
+private JobCategory category;
 }

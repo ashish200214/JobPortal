@@ -13,13 +13,15 @@ function PostJobPage() {
   const [mobileNo, setMobileNo] = useState("");
   const [city, setCity] = useState("");
 
+  // ✅ JOB CATEGORY
+  const [category, setCategory] = useState("");
+
   // ✅ SKILLS
   const [skillInput, setSkillInput] = useState("");
   const [skills, setSkills] = useState([]);
 
   function addSkill() {
     if (!skillInput.trim()) return;
-
     setSkills([...skills, skillInput.trim()]);
     setSkillInput("");
   }
@@ -31,16 +33,22 @@ function PostJobPage() {
   async function submitJob(e) {
     e.preventDefault();
 
+    if (!category) {
+      alert("Please select job category");
+      return;
+    }
+
     try {
       await api.post("/api/job", {
         jobRole,
         description,
-        skills,      // ✅ ARRAY
         salary,
         openings,
         companyName,
         mobileNo,
         city,
+        category, // ✅ NEW FIELD
+        skills,
       });
 
       alert("Job posted successfully");
@@ -49,7 +57,7 @@ function PostJobPage() {
     } catch (err) {
       console.error("POST JOB ERROR =", err.response || err);
 
-      if (err.response?.status === 403 || err.response?.status === 401) {
+      if (err.response?.status === 401 || err.response?.status === 403) {
         alert("Session expired. Please login again.");
         navigate("/employee/login");
       } else {
@@ -63,6 +71,7 @@ function PostJobPage() {
       <h3 className="mb-4">Post New Job</h3>
 
       <form onSubmit={submitJob}>
+
         {/* JOB ROLE */}
         <input
           className="form-control mb-2"
@@ -80,6 +89,20 @@ function PostJobPage() {
           onChange={(e) => setDescription(e.target.value)}
           required
         />
+
+        {/* JOB CATEGORY */}
+        <select
+          className="form-control mb-3"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          required
+        >
+          <option value="">Select Job Category</option>
+          <option value="INTERNSHIP">Internship</option>
+          <option value="PART_TIME">Part-time</option>
+          <option value="FULL_TIME">Full-time</option>
+          <option value="FREELANCE">Freelance</option>
+        </select>
 
         {/* SKILLS */}
         <label className="form-label fw-semibold">Skills</label>
