@@ -22,6 +22,7 @@ import PostJobPage from "./assets/PostJobPage";
 import JobApplicants from "./assets/JobApplicants";
 import ProtectedEmployeeRoute from "./assets/ProtectedEmployeeRoute";
 import StudentProfile from "./assets/StudentProfile";
+import StudentNotifications from "./assets/StudentNotifications";
 function App() {
   return (
     <>
@@ -109,7 +110,7 @@ function App() {
             </ProtectedEmployeeRoute>
           }
         />
-
+    <Route path="/student/notifications" element={<StudentNotifications />}></Route>
         {/* ===== FALLBACK ===== */}
         {/* <Route
           path="*"
