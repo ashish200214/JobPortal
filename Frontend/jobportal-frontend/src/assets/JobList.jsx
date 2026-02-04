@@ -155,6 +155,9 @@ function JobList() {
                     {expiryInfo.label}
                   </span>
                 )}
+                <p className="text-muted">
+                <b>Industry:</b> {job.companyIndustry}
+                </p>
 
                 <button
                   className={`btn ${
@@ -169,6 +172,7 @@ function JobList() {
                     ? "Applied ✔"
                     : "Apply"}
                 </button>
+
               </div>
             </div>
           );

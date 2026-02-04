@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import api from "../axios"; // ✅ USE INTERCEPTOR
+import api from "../axios";
 
 function JobApply() {
   const { jobId } = useParams();
@@ -12,6 +12,9 @@ function JobApply() {
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(false);
 
+  // ==========================
+  // LOAD DATA
+  // ==========================
   useEffect(() => {
     if (!jobId) {
       alert("Invalid job");
@@ -26,32 +29,34 @@ function JobApply() {
     try {
       setLoading(true);
 
-      // ✅ PUBLIC – NO TOKEN REQUIRED
       const jobRes = await api.get(`/api/job/${jobId}`);
 
-      // ✅ JWT REQUIRED (auto-added by interceptor)
+      if (jobRes.data.expired) {
+        alert("This job has expired");
+        navigate("/jobs");
+        return;
+      }
+
       const studentRes = await api.get("/api/student/me");
 
       setJob(jobRes.data);
       setStudent(studentRes.data);
 
     } catch (err) {
-      console.error("FETCH ERROR =", err);
-
-      if (err.response?.status === 401 || err.response?.status === 403) {
-        alert("Session expired. Please login again.");
-        localStorage.clear();
-        navigate("/student/login");
-      } else {
-        alert("Unable to load job details");
-        navigate("/jobs");
-      }
+      alert("Session expired. Please login again.");
+      localStorage.clear();
+      navigate("/student/login");
     } finally {
       setLoading(false);
     }
   }
 
+  // ==========================
+  // APPLY JOB
+  // ==========================
   async function applyJob() {
+    console.log("APPLY BUTTON CLICKED");
+
     if (!resumeFile) {
       alert("Please upload your resume (PDF)");
       return;
@@ -63,55 +68,35 @@ function JobApply() {
     try {
       setApplying(true);
 
-      await api.post(
-        `/api/job/apply/${jobId}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data"
-          }
-        }
-      );
+      await api.post(`/api/job/apply/${jobId}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
 
       alert("✅ Job Applied Successfully");
       navigate("/student/home");
 
     } catch (err) {
-      console.error("APPLY ERROR =", err);
-
-      if (err.response?.status === 400) {
-        alert("⚠ You have already applied for this job");
-      } else if (err.response?.status === 401 || err.response?.status === 403) {
-        alert("Session expired. Please login again.");
-        localStorage.clear();
-        navigate("/student/login");
-      } else {
-        alert("❌ Something went wrong while applying");
-      }
+      alert(err.response?.data || "Failed to apply");
     } finally {
       setApplying(false);
     }
   }
 
+  // ==========================
+  // UI
+  // ==========================
   if (loading) {
-    return (
-      <div className="container mt-5 text-center">
-        Loading job details...
-      </div>
-    );
+    return <div className="container mt-5 text-center">Loading...</div>;
   }
 
   if (!job || !student) {
-    return (
-      <div className="container mt-5 text-center">
-        Data not available
-      </div>
-    );
+    return <div className="container mt-5 text-center">Data not available</div>;
   }
 
   return (
     <div className="container mt-5">
       <div className="card shadow p-4">
+
         <h3>{job.jobRole}</h3>
         <p>{job.description}</p>
 
@@ -121,17 +106,25 @@ function JobApply() {
 
         <hr />
 
-        <h5>Applicant Details</h5>
-        <input
-          className="form-control mb-2"
-          value={student.email}
-          disabled
-        />
-        <input
-          className="form-control mb-2"
-          value={student.mobileNo}
-          disabled
-        />
+        <h5>About the Company</h5>
+        <p>{job.companyDescription}</p>
+
+        {job.companyWebsite && (
+          <p>
+            <b>Website:</b>{" "}
+            <a href={job.companyWebsite} target="_blank" rel="noreferrer">
+              {job.companyWebsite}
+            </a>
+          </p>
+        )}
+
+        <p><b>Industry:</b> {job.companyIndustry}</p>
+
+        <hr />
+
+        <h5>Your Details</h5>
+        <input className="form-control mb-2" value={student.email} disabled />
+        <input className="form-control mb-2" value={student.mobileNo} disabled />
 
         <input
           type="file"
@@ -140,13 +133,16 @@ function JobApply() {
           onChange={e => setResumeFile(e.target.files[0])}
         />
 
+        {/* ✅ GUARANTEED CLICKABLE BUTTON */}
         <button
-          className="btn btn-success"
+          type="button"
+          className="btn btn-success w-100"
           onClick={applyJob}
           disabled={applying}
         >
           {applying ? "Applying..." : "Confirm Apply"}
         </button>
+
       </div>
     </div>
   );

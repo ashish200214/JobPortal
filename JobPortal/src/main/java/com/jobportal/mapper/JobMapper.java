@@ -26,6 +26,9 @@ public class JobMapper {
         job.setMobileNo(dto.getMobileNo());
         job.setCity(dto.getCity());
         job.setCategory(dto.getCategory());
+        job.setCompanyDescription(dto.getCompanyDescription());
+        job.setCompanyWebsite(dto.getCompanyWebsite());
+        job.setCompanyIndustry(dto.getCompanyIndustry());
 
         // ✅ EXPIRY LOGIC
         int days = dto.getExpiryDays() != null ? dto.getExpiryDays() : 30;
@@ -68,6 +71,10 @@ public class JobMapper {
         dto.setCategory(job.getCategory());
         dto.setExpiryDate(job.getExpiryDate());
         dto.setExpired(job.isExpired());
+        dto.setCompanyDescription(job.getCompanyDescription());
+dto.setCompanyWebsite(job.getCompanyWebsite());
+dto.setCompanyIndustry(job.getCompanyIndustry());
+
 
         if (job.getSkills() != null) {
             dto.setSkills(

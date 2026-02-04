@@ -5,24 +5,31 @@ import api from "../axios";
 function PostJobPage() {
   const navigate = useNavigate();
 
+  // ================= JOB DETAILS =================
   const [jobRole, setJobRole] = useState("");
   const [description, setDescription] = useState("");
   const [salary, setSalary] = useState("");
   const [openings, setOpenings] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [mobileNo, setMobileNo] = useState("");
-  const [city, setCity] = useState("");
 
-  // ✅ CATEGORY
+  // ================= CATEGORY & EXPIRY =================
   const [category, setCategory] = useState("");
-
-  // ✅ EXPIRY DAYS
   const [expiryDays, setExpiryDays] = useState("");
 
-  // ✅ SKILLS
+  // ================= SKILLS =================
   const [skillInput, setSkillInput] = useState("");
   const [skills, setSkills] = useState([]);
 
+  // ================= COMPANY PROFILE =================
+  const [companyName, setCompanyName] = useState("");
+  const [companyDescription, setCompanyDescription] = useState("");
+  const [companyWebsite, setCompanyWebsite] = useState("");
+  const [companyIndustry, setCompanyIndustry] = useState("");
+
+  // ================= CONTACT & LOCATION =================
+  const [mobileNo, setMobileNo] = useState("");
+  const [city, setCity] = useState("");
+
+  // ================= SKILL HANDLERS =================
   function addSkill() {
     if (!skillInput.trim()) return;
     setSkills([...skills, skillInput.trim()]);
@@ -33,6 +40,7 @@ function PostJobPage() {
     setSkills(skills.filter((_, i) => i !== index));
   }
 
+  // ================= SUBMIT =================
   async function submitJob(e) {
     e.preventDefault();
 
@@ -45,22 +53,23 @@ function PostJobPage() {
       await api.post("/api/job", {
         jobRole,
         description,
-        skills,
         salary,
         openings,
+        category,
+        expiryDays: expiryDays || null,
+        skills,
         companyName,
+        companyDescription,
+        companyWebsite,
+        companyIndustry,
         mobileNo,
-        city,
-        category,              // ✅ CATEGORY SENT
-        expiryDays: expiryDays || null // ✅ OPTIONAL
+        city
       });
 
       alert("Job posted successfully");
       navigate("/employee/home");
 
     } catch (err) {
-      console.error("POST JOB ERROR =", err.response || err);
-
       if (err.response?.status === 401 || err.response?.status === 403) {
         alert("Session expired. Please login again.");
         navigate("/employee/login");
@@ -71,12 +80,14 @@ function PostJobPage() {
   }
 
   return (
-    <div className="container mt-5">
+    <div className="container mt-5 mb-5">
       <h3 className="mb-4">Post New Job</h3>
 
       <form onSubmit={submitJob}>
 
-        {/* JOB ROLE */}
+        {/* ================= JOB DETAILS ================= */}
+        <h5 className="mb-3">Job Details</h5>
+
         <input
           className="form-control mb-2"
           placeholder="Job Role"
@@ -85,7 +96,42 @@ function PostJobPage() {
           required
         />
 
-        {/* CATEGORY */}
+        <textarea
+          className="form-control mb-3"
+          placeholder="Job Description"
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+          required
+        />
+
+        <div className="row mb-3">
+          <div className="col">
+            <input
+              type="number"
+              className="form-control"
+              placeholder="Salary"
+              value={salary}
+              onChange={e => setSalary(e.target.value)}
+              required
+            />
+          </div>
+          <div className="col">
+            <input
+              type="number"
+              className="form-control"
+              placeholder="Openings"
+              value={openings}
+              onChange={e => setOpenings(e.target.value)}
+              required
+            />
+          </div>
+        </div>
+
+        <hr />
+
+        {/* ================= CATEGORY & EXPIRY ================= */}
+        <h5 className="mb-3">Job Type & Expiry</h5>
+
         <select
           className="form-control mb-2"
           value={category}
@@ -99,17 +145,20 @@ function PostJobPage() {
           <option value="FREELANCE">Freelance</option>
         </select>
 
-        {/* DESCRIPTION */}
-        <textarea
+        <input
+          type="number"
           className="form-control mb-3"
-          placeholder="Job Description"
-          value={description}
-          onChange={e => setDescription(e.target.value)}
-          required
+          placeholder="Job expires in (days) — default 30"
+          value={expiryDays}
+          onChange={e => setExpiryDays(e.target.value)}
+          min="1"
         />
 
-        {/* SKILLS */}
-        <label className="form-label fw-semibold">Skills</label>
+        <hr />
+
+        {/* ================= SKILLS ================= */}
+        <h5 className="mb-3">Required Skills</h5>
+
         <div className="d-flex mb-2">
           <input
             className="form-control"
@@ -130,7 +179,7 @@ function PostJobPage() {
           {skills.map((skill, index) => (
             <span
               key={index}
-              className="badge bg-primary me-2"
+              className="badge bg-primary me-2 mb-2"
               style={{ cursor: "pointer" }}
               onClick={() => removeSkill(index)}
             >
@@ -139,37 +188,11 @@ function PostJobPage() {
           ))}
         </div>
 
-        {/* SALARY */}
-        <input
-          type="number"
-          className="form-control mb-2"
-          placeholder="Salary"
-          value={salary}
-          onChange={e => setSalary(e.target.value)}
-          required
-        />
+        <hr />
 
-        {/* OPENINGS */}
-        <input
-          type="number"
-          className="form-control mb-2"
-          placeholder="Openings"
-          value={openings}
-          onChange={e => setOpenings(e.target.value)}
-          required
-        />
+        {/* ================= COMPANY PROFILE ================= */}
+        <h5 className="mb-3">Company Profile</h5>
 
-        {/* EXPIRY DAYS */}
-        <input
-          type="number"
-          className="form-control mb-2"
-          placeholder="Job expires in (days) — default 30"
-          value={expiryDays}
-          onChange={e => setExpiryDays(e.target.value)}
-          min="1"
-        />
-
-        {/* COMPANY */}
         <input
           className="form-control mb-2"
           placeholder="Company Name"
@@ -178,7 +201,33 @@ function PostJobPage() {
           required
         />
 
-        {/* MOBILE */}
+        <textarea
+          className="form-control mb-2"
+          placeholder="Company Description"
+          value={companyDescription}
+          onChange={e => setCompanyDescription(e.target.value)}
+          required
+        />
+
+        <input
+          className="form-control mb-2"
+          placeholder="Company Website (optional)"
+          value={companyWebsite}
+          onChange={e => setCompanyWebsite(e.target.value)}
+        />
+
+        <input
+          className="form-control mb-3"
+          placeholder="Company Industry"
+          value={companyIndustry}
+          onChange={e => setCompanyIndustry(e.target.value)}
+        />
+
+        <hr />
+
+        {/* ================= CONTACT & LOCATION ================= */}
+        <h5 className="mb-3">Contact & Location</h5>
+
         <input
           className="form-control mb-2"
           placeholder="Mobile Number"
@@ -187,9 +236,8 @@ function PostJobPage() {
           required
         />
 
-        {/* CITY */}
         <input
-          className="form-control mb-3"
+          className="form-control mb-4"
           placeholder="City"
           value={city}
           onChange={e => setCity(e.target.value)}
@@ -206,3 +254,4 @@ function PostJobPage() {
 }
 
 export default PostJobPage;
+  

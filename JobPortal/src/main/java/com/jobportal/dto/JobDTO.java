@@ -27,4 +27,9 @@ public class JobDTO {
 
     // ✅ ONLY FOR POST JOB
     private Integer expiryDays;
+    // ===== COMPANY PROFILE =====
+private String companyDescription;
+private String companyWebsite;
+private String companyIndustry;
+
 }

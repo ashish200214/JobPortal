@@ -44,4 +44,13 @@ public class Job {
     @JoinColumn(name = "employee_id")
     @JsonIgnore
     private Employee employee;
+
+    // ===== COMPANY PROFILE =====
+@Column(length = 2000)
+private String companyDescription;
+
+private String companyWebsite;
+
+private String companyIndustry;
+
 }
