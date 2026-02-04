@@ -140,4 +140,41 @@ public class StudentProfileController {
         exp.setStudent(student);
         return experienceRepo.save(exp);
     }
+    // ================= EDUCATION =================
+@PostMapping("/education")
+public Education addEducation(
+        @RequestBody Education edu,
+        Authentication auth
+) {
+    Student student = studentRepo.findByEmail(auth.getName())
+            .orElseThrow(() -> new RuntimeException("Student not found"));
+
+    edu.setStudent(student);
+    return educationRepo.save(edu);
+}
+// ================= ADD SKILL =================
+@PostMapping("/add-skill")
+public Skill addSkill(
+        @RequestParam String skillName,
+        Authentication auth
+) {
+    Student student = studentRepo.findByEmail(auth.getName())
+            .orElseThrow(() -> new RuntimeException("Student not found"));
+
+    Skill skill = skillRepo.findByNameIgnoreCase(skillName)
+            .orElseGet(() -> {
+                Skill s = new Skill();
+                s.setName(skillName);
+                return skillRepo.save(s);
+            });
+
+    // prevent duplicates
+    if (!student.getSkills().contains(skill)) {
+        student.getSkills().add(skill);
+        studentRepo.save(student);
+    }
+
+    return skill;
+}
+
 }

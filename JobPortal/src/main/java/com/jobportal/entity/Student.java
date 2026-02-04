@@ -2,6 +2,9 @@ package com.jobportal.entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,6 +32,7 @@ private String email;
 private String password;
 private String mobileNo;
 private String workingStatus;
+
 @ManyToMany
  @JoinTable(
     name="student_skills", joinColumns = @JoinColumn(name="student_id"),
@@ -39,5 +44,8 @@ private String profileSummary;
 
 private String resumeUrl; // resume file path
 
+@OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+@JsonIgnore   // ✅ ADD THIS
+private List<Education> educations;
 
 }

@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import com.jobportal.entity.Application;
 import com.jobportal.entity.ApplicationStatus;
 import com.jobportal.entity.Notification;
+import com.jobportal.entity.Student;
 import com.jobportal.repository.ApplicationRepository;
+import com.jobportal.repository.EducationRepo;
 import com.jobportal.repository.NotificationRepository;
 
 @RestController
@@ -22,25 +24,31 @@ private EmailService emailService;
 @Autowired
 private NotificationRepository notificationRepo;
 
+@Autowired
+private EducationRepo educationRepo;
+
     @Autowired
     private ApplicationRepository applicationRepo;
 
     // ==============================
     // GET APPLICANTS FOR A JOB
     // ==============================
-    @GetMapping("/job/{jobId}")
-    public List<Application> getApplicants(
-            @PathVariable Long jobId,
-            Authentication authentication
-    ) {
-        // empId available if you want to add ownership validation later
-        // Long empId = (Long) authentication.getPrincipal();
+  @GetMapping("/job/{jobId}")
+public List<Application> getApplicants(
+        @PathVariable Long jobId,
+        Authentication authentication
+) {
+    List<Application> apps = applicationRepo.findByJobId(jobId);
 
-        return applicationRepo.findByJobId(jobId);
-    }
+    // 🔥 attach education to student
+    apps.forEach(app -> {
+        Student s = app.getStudent();
+        s.setEducations(educationRepo.findByStudent(s));
+    });
 
-    // ==============================
-    //   STATUS (ACCEPT / REJECT)
+    return apps;
+}
+
     
     @PutMapping("/{applicationId}/status")
 public Application updateStatus(

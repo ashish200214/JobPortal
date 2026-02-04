@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -16,9 +18,19 @@ public class Application {
     private Long id;
 
     @ManyToOne
+@JsonIgnoreProperties({
+    "password",
+    "skills",
+    "educations",
+    "resumeUrl"
+})
     private Student student;
 
     @ManyToOne
+    @JsonIgnoreProperties({
+    "skills",
+    "employee"
+    })
     private Job job;
 
     @CreationTimestamp

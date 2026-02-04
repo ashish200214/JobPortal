@@ -2,29 +2,82 @@ import { useState } from "react";
 import api from "../../axios";
 
 function Languages({ languages, onUpdate }) {
-  const [l, setL] = useState({ name: "", proficiency: "" });
+  const [lang, setLang] = useState({
+    name: "",
+    proficiency: ""
+  });
 
-  const add = () => {
-    api.post("/api/student/language", l)
-      .then(() => {
-        setL({ name: "", proficiency: "" });
-        onUpdate();
-      });
+  // =====================
+  // ADD LANGUAGE
+  // =====================
+  const addLanguage = async () => {
+    if (!lang.name || !lang.proficiency) {
+      alert("Please enter language and proficiency");
+      return;
+    }
+
+    try {
+      await api.post("/api/student/language", lang);
+      setLang({ name: "", proficiency: "" });
+      onUpdate();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to add language");
+    }
   };
 
   return (
     <div>
-      <h5>Languages</h5>
+      <h5 className="mb-3">Languages</h5>
 
-      {languages.map(lang => (
-        <div key={lang.id}>{lang.name} – {lang.proficiency}</div>
-      ))}
+      {/* 🔥 BADGE LIST */}
+      {languages.length === 0 && (
+        <p className="text-muted">No languages added</p>
+      )}
 
-      <input className="form-control mb-1" placeholder="Language"
-        value={l.name}
-        onChange={e => setL({ ...l, name: e.target.value })}
+      <div className="mb-3">
+        {languages.map((l) => (
+          <span
+            key={l.id}
+            className="badge bg-primary me-2 mb-2"
+            style={{
+              fontSize: "0.9rem",
+              padding: "8px 12px",
+              borderRadius: "20px"
+            }}
+          >
+            {l.name} • {l.proficiency}
+          </span>
+        ))}
+      </div>
+
+      {/* 🔥 INPUTS */}
+      <input
+        className="form-control mb-2"
+        placeholder="Language (e.g. English)"
+        value={lang.name}
+        onChange={(e) =>
+          setLang({ ...lang, name: e.target.value })
+        }
       />
-      <button className="btn btn-success" onClick={add}>Add Language</button>
+
+      <select
+        className="form-control mb-2"
+        value={lang.proficiency}
+        onChange={(e) =>
+          setLang({ ...lang, proficiency: e.target.value })
+        }
+      >
+        <option value="">Select Proficiency</option>
+        <option value="Basic">Basic</option>
+        <option value="Intermediate">Intermediate</option>
+        <option value="Fluent">Fluent</option>
+        <option value="Native">Native</option>
+      </select>
+
+      <button className="btn btn-success" onClick={addLanguage}>
+        Add Language
+      </button>
     </div>
   );
 }
